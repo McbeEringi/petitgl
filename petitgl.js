@@ -1,6 +1,5 @@
 //build: 2109061
 //example: https://mcbeeringi.github.io/amuse/petitgl.html
-'use strict'
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		let gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
@@ -141,7 +140,7 @@ class PetitGL{
 			gl.bindRenderbuffer(gl.RENDERBUFFER,null);
 			gl.bindFramebuffer(gl.FRAMEBUFFER,null);
 			this.buffer_[x.name]={f,d,t};
-			if(this.tex_[x.tex])console.log(`${this.tex_[x.tex]} is overwritten by buffer ${x.bname}.`);
+			if(this.tex_[x.tex])console.log(`${this.tex_[x.tex]} is overwritten by buffer ${x.name}.`);
 			this.tex_[x.tex]={tex:t,size:[w,h]};
 		}
 		return this;
