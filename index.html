@@ -9,7 +9,7 @@
 			:root{background:#000;color:#fff;font-family:monospace;}
 			a:link,a:visited{color:#aef;}a:hover{color:#8af;}a:active{color:#48f;}
 			canvas{position:fixed;top:0;left:0;z-index:-1;}
-			[alt=icon]{display:none;}
+			[alt=icon]{background-color:#fff;max-width:320px;border-radius:25%;}
 		</style>
 		<script src="petitgl.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -34,13 +34,30 @@
 				])
 				.compile(
 					'test',//program name
-					`attribute vec2 UV;void main(){gl_Position=vec4(UV,0,1);}`,//vsh
-					`precision mediump float;uniform highp float time;uniform vec2 res;
-					uniform sampler2D tex0;uniform vec2 tex0res;uniform sampler2D buffer;
+					`attribute vec2 UV;
+					void main(){
+						gl_Position=vec4(UV,0,1);
+					}`,//vsh
+					`precision highp float;
+					uniform float time;
+					uniform vec2 res;
+					uniform sampler2D tex0;
+					uniform vec2 tex0res;
+					uniform sampler2D buffer;
+					float hash12(vec2 p){
+						vec3 p3=fract(vec3(p.xyx)*.1031);
+						p3+=dot(p3,p3.yzx+33.33);
+						return fract((p3.x+p3.y)*p3.z);
+					}
+					mat2 rot(float r){return mat2(cos(r),sin(r),-sin(r),cos(r));}
 					void main(){
 						const float pi=3.141593;
 						vec4 prev=texture2D(buffer,gl_FragCoord.xy/res);
-						vec4 now=texture2D(tex0,fract((gl_FragCoord.xy+vec2(time*pi*.5+cos(time*pi),sin(time*pi))*32.)/tex0res));
+						vec2 p=gl_FragCoord.xy/tex0res+vec2(time*pi*.5+cos(time*pi),sin(time*pi)+time*pi*.5*res.y/res.x)*.05;
+						p=p*2.*rot(pi/6.);
+						float r=floor(hash12(floor(p)+1024.)*4.)*.5*pi;
+						p=(p-floor(p)-.5)*rot(r)+floor(p)+.5;
+						vec4 now=texture2D(tex0,fract(p));
 						gl_FragColor=mix(prev*.98,now,now.a);
 					}`//fsh
 				)
