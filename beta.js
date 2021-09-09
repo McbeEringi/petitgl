@@ -92,12 +92,13 @@ class PetitGL{
 		const tmp=this.aloc_[pn]||{};
 		for(const x of alocs){if(!tmp[x])tmp[x]=this.gl.getAttribLocation(this.prg_[pn].dat,x);}
 		this.aloc_[pn]=tmp;
+		return this;
 	}
 	att(atts){//atts: [...{name:attName,data:Array,slice:Int}]
 		const gl=this.gl;
 		for(const x of atts){
-			if(!this.att_[x.name])this.att_[x.name]={vbo:gl.createBuffer()};
-			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.name].vbo);
+			if(!this.att_[x.name])this.att_[x.name]={dat:gl.createBuffer()};
+			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.name].dat);
 			gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(x.data),gl.STATIC_DRAW);
 			gl.bindBuffer(gl.ARRAY_BUFFER,null);
 			this.att_[x.name].slice=x.slice;
@@ -107,10 +108,11 @@ class PetitGL{
 	ibo(ibos){//ibos: [...{name:iboName,data:Array}]
 		const gl=this.gl;
 		for(const x of ibos){
-			if(!this.ibo_[x.name])this.ibo_[x.name]=gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER,this.ibo_[x.name]);
-			gl.bufferData(gl.ARRAY_BUFFER,new Int16Array(x.data),gl.STATIC_DRAW);
-			gl.bindBuffer(gl.ARRAY_BUFFER,null);
+			if(!this.ibo_[x.name])this.ibo_[x.name]={dat:gl.createBuffer()};
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[x.name]);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Int16Array(x.data),gl.STATIC_DRAW);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+			this.ibo_[x.name].l=x.data.length;
 		}
 		return this;
 	}
@@ -118,9 +120,44 @@ class PetitGL{
 		const tmp=this.uloc_[pn]||{};
 		for(const x of ulocs){if(!tmp[x])tmp[x]=this.gl.getUniformLocation(this.prg_[pn].dat,x);}
 		this.uloc_[pn]=tmp;
+		return this;
 	}
-	draw(pn,atts,ibo,unis,buf,mode='TRIANGLES'){//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName, unis: [...{loc:ulocName,data:Array||texName,type:String}](, buf:bufName)
-
+	uni(pn,unis){//unis: [...{loc:ulocName,data:Array||texName,(type:String,rname:ulocName)}]
+		const gl=this.gl,
+			fim={
+				i:['uniform1iv','uniform2iv','uniform3iv','uniform4iv'],
+				f:['uniform1fv','uniform2fv','uniform3fv','uniform4fv'],
+				m:{4:'uniformMatrix2fv',9:'uniformMatrix3fv',16:'uniformMatrix4fv'}
+			};
+		let texi=0;
+		for(const x of unis){
+			if(fim[x.type][x.data.length])gl[fim[x.type][x.data.length]](this.uloc[pn][x.loc],...(x.type==m?[false,x.data]:[x.data]));
+			else if(typeof x.data=='string'){
+				if(!this.tex_[x.data])continue;
+				gl.activeTexture(gl['TEXTURE'+texi]);
+				gl.bindTexture(gl.TEXTURE_2D,this.tex_[x.data].tex);
+				gl.uniform1i(this.uloc[pn][x.loc],texi);
+				if(x.rname)gl.uniform2fv(this.uloc[pn][x.rname],this.tex_[x.data].size);
+				texi++;
+			}else throw x;
+		}
+		return this;
 	}
-	flush(){this.gl.flush();}
+	draw(pn,atts,ibo,buf,mode='TRIANGLES'){//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName(, buf:bufName)
+		const gl=this.gl;
+		gl.useProgram(this.prg_[pn].dat);
+		if(bname)gl.bindFramebuffer(gl.FRAMEBUFFER,this.buf_[bname].f);
+		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);//gl.clearColor(...this.col);gl.clearDepth(1);
+		for(const x in atts){
+			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.att].dat);
+			gl.enableVertexAttribArray(this.aloc_[pn][x.loc]);
+			gl.vertexAttribPointer(this.aloc_[pn][x.loc],this.att_[x.att].slice,gl.FLOAT,false,0,0);
+			gl.bindBuffer(gl.ARRAY_BUFFER,null);
+		}
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[ibo].dat);
+		gl.drawElements(gl[mode],this.ibo_[ibo].l,gl.UNSIGNED_SHORT,0);
+		if(bname)gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+		return this;
+	}
+	flush(){this.gl.flush();return this;}
 }
