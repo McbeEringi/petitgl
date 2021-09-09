@@ -126,13 +126,13 @@ class PetitGL{
 		const gl=this.gl,
 			fim={
 				0:{},
-				i:['uniform1iv','uniform2iv','uniform3iv','uniform4iv'],
-				f:['uniform1fv','uniform2fv','uniform3fv','uniform4fv'],
+				i:[0,'uniform1iv','uniform2iv','uniform3iv','uniform4iv'],
+				f:[0,'uniform1fv','uniform2fv','uniform3fv','uniform4fv'],
 				m:{4:'uniformMatrix2fv',9:'uniformMatrix3fv',16:'uniformMatrix4fv'}
 			};
 		let texi=0;
 		for(const x of unis){
-			if(fim[x.type||0][x.data.length-1])gl[fim[x.type][x.data.length-1]](this.uloc_[pn][x.loc],...(x.type=='m'?[false,x.data]:[x.data]));
+			if(fim[x.type||0][x.data.length])gl[fim[x.type][x.data.length]](this.uloc_[pn][x.loc],...(x.type=='m'?[false,x.data]:[x.data]));
 			else if(typeof x.data=='string'){
 				if(!this.tex_[x.data])continue;
 				gl.activeTexture(gl['TEXTURE'+texi]);
