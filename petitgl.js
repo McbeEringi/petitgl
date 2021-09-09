@@ -89,8 +89,8 @@ class PetitGL{
 		return this;
 	}
 	defAtt(pn,alocs){//pn: prgName, alocs: [...alocName]
-		const tmp=this.aloc_[pn]||{};
-		for(const x of alocs){if(!tmp[x])tmp[x]=this.gl.getAttribLocation(this.prg_[pn].dat,x);}
+		const tmp={};
+		for(const x of alocs)tmp[x]=this.gl.getAttribLocation(this.prg_[pn].dat,x);
 		this.aloc_[pn]=tmp;
 		return this;
 	}
@@ -117,8 +117,8 @@ class PetitGL{
 		return this;
 	}
 	defUni(pn,ulocs){//pn: prgName, ulocs: [...ulocName]
-		const tmp=this.uloc_[pn]||{};
-		for(const x of ulocs){if(!tmp[x])tmp[x]=this.gl.getUniformLocation(this.prg_[pn].dat,x);}
+		const tmp={};
+		for(const x of ulocs)tmp[x]=this.gl.getUniformLocation(this.prg_[pn].dat,x);
 		this.uloc_[pn]=tmp;
 		return this;
 	}
