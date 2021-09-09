@@ -9,11 +9,12 @@
 			:root{background:#000;color:#fff;font-family:monospace;}
 			a:link,a:visited{color:#aef;}a:hover{color:#8af;}a:active{color:#48f;}
 			canvas{position:fixed;top:0;left:0;z-index:-1;}
+			[alt=icon]{display:none;}
 		</style>
 		<script src="petitgl.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 		<script>
-		fetch('README.md').then(x=>x.text()).then(x=>document.body.insertAdjacentHTML('afterbegin',marked(x,{baseUrl:'/'})));
+		fetch('README.md').then(x=>x.text()).then(x=>document.body.insertAdjacentHTML('afterbegin',marked(x)));
 		let btex;
 			const t0=new Date();
 				main=new PetitGL(undefined,[0,0,0,1])

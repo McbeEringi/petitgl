@@ -1,5 +1,6 @@
 # petitgl
+![icon](img/icon.svg)  
 A petit JS library to handle WebGL more easily  
-[Code](petitgl.js)
+[src](petitgl.js)
 ## usage
 ??
