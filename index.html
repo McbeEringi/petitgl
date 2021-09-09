@@ -31,7 +31,7 @@
 					uniform sampler2D tex0;uniform vec2 tex0res;uniform sampler2D buffer;
 					void main(){
 						vec4 prev=texture2D(buffer,gl_FragCoord.xy/res);
-						vec4 now=texture2D(tex0,fract((gl_FragCoord.xy+vec2(time+cos(time*4.),sin(time*4.))*32.)/tex0res));
+						vec4 now=texture2D(tex0,fract((gl_FragCoord.xy+vec2(time*3.141593+cos(time*4.),sin(time*4.))*32.)/tex0res));
 						gl_FragColor=mix(prev,now,now.a)-.01;
 					}`//fsh
 				)
