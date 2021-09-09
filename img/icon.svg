@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128">
+	<desc>PetitGL icon</desc>
+	<style>
+		g,g>path{fill:#0000;stroke:#63c;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;transform-origin:center;}
+	</style>
+	<g>
+		<path d="M16,112v-48a48,48,0,1,1,96,0"/>
+		<g style="transform:rotate(150deg);">
+			<path d="M16,64a48,48,0,1,1,96,0h-88"/>
+			<path d="M40,52v28a12,12,0,0,0,12,12m12,0v.000000001m0,-12v-16" style="transform:scale(-1);"/>
+			<path d="M40,52v28a12,12,0,0,0,12,12m12,0v.000000001m0,-12v-16"/>
+		</g>
+	</g>
+</svg>

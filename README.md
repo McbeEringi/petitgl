@@ -1,2 +1,5 @@
 # petitgl
-A JS library to handle WebGL more easily and write simply 
+A petit JS library to handle WebGL more easily  
+[Code](petitgl.js)
+## usage
+??
