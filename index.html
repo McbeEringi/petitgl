@@ -67,6 +67,7 @@
 						float r=floor(hash12(floor(p)+1024.)*4.)*.5*pi;
 						p=(p-floor(p)-.5)*rot(r)+floor(p)+.5;
 						vec4 now=texture2D(tex0,fract(p));
+						now.a*=hash12(floor(p)-1024.);
 						gl_FragColor=mix(prev*.98,now,now.a);
 					}`//fsh
 				)
