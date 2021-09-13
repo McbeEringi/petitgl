@@ -49,7 +49,7 @@ class PetitGL{
 		};
 		return this;
 	}
-	tex(texs){//texs: [...{name:texName,url,fx(tex,size)}]
+	tex(texs){//texs: [...{name:texName,url:String,fx(tex,size)}]
 		const gl=this.gl;
 		for(const x of texs){
 			const img=new Image();

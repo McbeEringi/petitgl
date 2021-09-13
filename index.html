@@ -19,10 +19,14 @@
 			a:link,a:visited{color:#aef;}a:hover{color:#8af;}a:active{color:#48f;}
 			canvas{position:fixed;top:0;left:0;z-index:-1;}
 			[alt=icon]{background-color:#fff;width:100%;max-width:320px;border-radius:25%;}
+			.language-js{background-color:#222;padding:12px;}
 		</style>
 		<script src="petitgl.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/atom-one-dark.min.css" media="print" onload="this.media='all';">
 		<script>
+		marked.setOptions({highlight:(c,l)=>hljs.highlightAuto(c,[l]).value});
 		fetch('README.md').then(x=>x.text()).then(x=>document.body.insertAdjacentHTML('afterbegin',marked(x)));
 		let btex;
 			const t0=new Date();
