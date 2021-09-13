@@ -1,3 +1,4 @@
+//build: 2109140
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
@@ -144,11 +145,11 @@ class PetitGL{
 		}
 		return this;
 	}
-	draw(pn,atts,ibo,buf,mode='TRIANGLES'){//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName(, buf:bufName)
+	draw(pn,atts,ibo,cl=1,buf,mode='TRIANGLES'){//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName(, cl:Boolean, buf:bufName, mode: glDrawMode)
 		const gl=this.gl;
 		gl.useProgram(this.prg_[pn].dat);
 		if(buf)gl.bindFramebuffer(gl.FRAMEBUFFER,this.buf_[buf].f);
-		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);//gl.clearColor(...this.col);gl.clearDepth(1);
+		if(cl)gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.clearColor(...this.col);gl.clearDepth(1);
 		for(const x of atts){
 			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.att].dat);
 			gl.enableVertexAttribArray(this.aloc_[pn][x.loc]);
