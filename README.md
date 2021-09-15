@@ -60,15 +60,15 @@ this.buffer(bufs);
 ```
 - `bufs` Array  
 	```js
-	[{name, tex(, width, height)}...]
+	[{name, tex, width, height}...]
 	```
 	- `name` bufName:String  
 		defines buffer name with string.
-	- `tex` URL:texName:String  
+	- `tex` texName:String  
 		defines texture name to access from uniforms with string.
 	- `width` *Optional* Number  
 		defines width of buffer with Number.
-	- `height` *Optional* Nymber  
+	- `height` *Optional* Number  
 		defines height of buffer with Number
 
 ### attributes
