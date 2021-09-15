@@ -17,7 +17,7 @@
 		<style>
 			:root{background:#000;color:#fff;font-family:monospace;}
 			a:link,a:visited{color:#aef;}a:hover{color:#8af;}a:active{color:#48f;}
-			canvas{position:fixed;top:0;left:0;z-index:-1;}
+			canvas{position:fixed;top:0;left:0;z-index:-1;width:100vw;height:100vh;object-fit:cover;}
 			[alt=icon]{background-color:#fff;width:100%;max-width:320px;border-radius:25%;}
 			.language-js{background-color:#222;padding:12px;}
 		</style>
@@ -109,7 +109,7 @@
 				};
 		loop();
 		document.body.appendChild(main.c);
-		onresize=()=>main.resize(innerWidth,innerHeight).buffer([{name:'buff0',tex:'btex0'},{name:'buff1',tex:'btex1'}]);
+		//onresize=()=>main.resize(innerWidth,innerHeight).buffer([{name:'buff0',tex:'btex0'},{name:'buff1',tex:'btex1'}]);
 		</script>
 	</body>
 </html>
