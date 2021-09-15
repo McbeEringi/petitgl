@@ -69,9 +69,50 @@ this.buffer(bufs);
 	- `width` *Optional* Number  
 		defines width of buffer with Number.
 	- `height` *Optional* Number  
-		defines height of buffer with Number
+		defines height of buffer with Number.
 
 ### attributes
+#### att
+```js
+this.att(atts);
+```
+- `atts` Array  
+	```js
+	[{name, data, slice}...]
+	```
+	- `name` attName:String  
+		defines attribute name with string.
+	- `data` Array  
+		defines attribute data with Array.
+	- `slice` Number  
+		defines length of attribute. ie 2 for vec2, 4 for vec4.
+
+#### ibo
+```js
+this.ibo(ibos);
+```
+- `ibos` Array  
+	```js
+	[{name, data}...]
+	```
+	- `name` iboName:String  
+		defines ibo name with string.
+	- `data` Array  
+		defines ibo data with Array.
+
+#### defAtt
+```js
+this.defAtt(prgName,alocs);
+```
+- `prgName` prgName:String  
+	specify the program to get attribute location as String.
+- `alocs` Array  
+	```js
+	[alocName...]
+	```
+	- `alocName` alocName:String  
+		defines attribute location name with string.
+
 ### uniforms
 ### draw
 ## example
