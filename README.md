@@ -47,13 +47,30 @@ this.tex(textures);
 	[{name, url, fx}...]
 	```
 	- `name` texName:String  
-		defines texture name with string.
+		defines texture to access from uniforms name with string.
 	- `url` URL:String  
 		defines location of the image file with string.
 	- `fx` Function  
-		defines callback function called when the texture loading succeeded.
+		callback function called when the texture loading succeeded.
 
 ### frame buffer
+#### buffer
+```js
+this.buffer(bufs);
+```
+- `bufs` Array  
+	```js
+	[{name, tex(, width, height)}...]
+	```
+	- `name` bufName:String  
+		defines buffer name with string.
+	- `tex` URL:texName:String  
+		defines texture name to access from uniforms with string.
+	- `width` *Optional* Number  
+		defines width of buffer with Number.
+	- `height` *Optional* Nymber  
+		defines height of buffer with Number
+
 ### attributes
 ### uniforms
 ### draw
