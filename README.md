@@ -21,9 +21,9 @@ new PetitGL(canvas, color);
 this.resize(width, height);
 ```
 - `width` Number  
-	defines width with number.  
+	defines width with Number.  
 - `height` Number  
-	defines height with number.  
+	defines height with Number.  
 
 ### create program
 #### compile
@@ -31,7 +31,7 @@ this.resize(width, height);
 this.compile(programName, vertexShader, fragmentShader);
 ```
 - `programName` programName:String  
-	defines program name with string.
+	defines program name with String.
 - `vertexShader` String  
 	vertex shader used in this program.
 - `fragmentShader` String  
@@ -47,9 +47,9 @@ this.tex(textures);
 	[{name, url, fx}...]
 	```
 	- `name` texName:String  
-		defines texture to access from uniforms name with string.
+		defines texture to access from uniforms name with String.
 	- `url` URL:String  
-		defines location of the image file with string.
+		defines location of the image file with String.
 	- `fx` Function  
 		callback function called when the texture loading succeeded.
 
@@ -63,15 +63,28 @@ this.buffer(bufs);
 	[{name, tex, width, height}...]
 	```
 	- `name` bufName:String  
-		defines buffer name with string.
+		defines buffer name with String.
 	- `tex` texName:String  
-		defines texture name to access from uniforms with string.
+		defines texture name to access from uniforms with String.
 	- `width` *Optional* Number  
 		defines width of buffer with Number.
 	- `height` *Optional* Number  
 		defines height of buffer with Number.
 
 ### attributes
+#### defAtt
+```js
+this.defAtt(prgName, alocs);
+```
+- `prgName` prgName:String  
+	specify program to get attribute location with prgName.
+- `alocs` Array  
+	```js
+	[alocName...]
+	```
+	- `alocName` alocName:String  
+		defines attribute location name with String.
+
 #### att
 ```js
 this.att(atts);
@@ -81,7 +94,7 @@ this.att(atts);
 	[{name, data, slice}...]
 	```
 	- `name` attName:String  
-		defines attribute name with string.
+		defines attribute name with String.
 	- `data` Array  
 		defines attribute data with Array.
 	- `slice` Number  
@@ -96,23 +109,30 @@ this.ibo(ibos);
 	[{name, data}...]
 	```
 	- `name` iboName:String  
-		defines ibo name with string.
+		defines ibo name with String.
 	- `data` Array  
 		defines ibo data with Array.
 
-#### defAtt
+### uniforms
+#### defUni
 ```js
-this.defAtt(prgName,alocs);
+this.defUni(prgName, ulocs);
 ```
 - `prgName` prgName:String  
-	specify the program to get attribute location as String.
-- `alocs` Array  
+	specify program to get uniform location with prgName.
+- `ulocs` Array  
 	```js
-	[alocName...]
+	[ulocName...]
 	```
-	- `alocName` alocName:String  
-		defines attribute location name with string.
+	- `ulocName` ulocName:String  
+		defines uniform location name with String.
 
-### uniforms
+after recompiled, running defUni is necessary.
+
+#### uni
+```js
+this.uni(prgName, unis)
+```
+
 ### draw
 ## example
