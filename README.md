@@ -64,7 +64,7 @@ this.tex(textures);
 			specify `img` or `vid`.
 		- `fx` *Optinal* Function  
 			callback function runs after file is loaded.  
-			proper HTMLElement will be taken as argument.
+			current object of textures array that data property is replaced with proper HTMLElement will be taken as argument.
 	- `animate` *Optinal* Boolean  
 		defines whether this texture needs update every frame or not.  
 		default is `false`.
