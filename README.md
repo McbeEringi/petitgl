@@ -155,7 +155,7 @@ after recompiled, running defUni is necessary.
 
 #### uni
 ```js
-this.uni(prgName, unis)
+this.uni(prgName, unis);
 ```
 - `prgName` prgName:String  
 	specify program to get uniform location with prgName.
@@ -187,7 +187,7 @@ this.uni(prgName, unis)
 ### draw
 #### draw
 ```js
-	this.draw(prgName, atts, ibo, clear, buf, mode)//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName(, cl:Boolean, buf:bufName, mode: glDrawMode)
+	this.draw(prgName, atts, ibo, clear, buf, mode);
 ```
 - `prgName` prgName:String  
 	specify program to get uniform location with prgName.
