@@ -44,14 +44,38 @@ this.tex(textures);
 ```
 - `textures` Array  
 	```js
-	[{name, url, fx}...]
+	[{name, data, animate, flush}...]
 	```
 	- `name` texName:String  
-		defines texture to access from uniforms name with String.
-	- `url` URL:String  
-		defines location of the image file with String.
-	- `fx` Function  
-		callback function called when the texture loading succeeded.
+		defines texture to access from uniforms name with String.  
+		always required.
+	- `data` *Optinal* HTMLImageElement || HTMLVideoElement || HTMLCanvasElement
+		specify loaded HTMLElement applied to texture.  
+		required when initialize.
+	- `data` *Optinal* Object  
+		required when initialize.
+		```js
+		{url, type, fx}
+		```
+		- `url` String  
+			defines location of the file with String.
+		- `type` String  
+			defines type of the file with String.  
+			specify `img` or `vid`.
+		- `fx` *Optinal* Function  
+			callback function runs after file is loaded.  
+			proper HTMLElement will be taken as argument.
+	- `animate` *Optinal* Boolean  
+		defines whether this texture needs update every frame or not.  
+		default is `false`.
+	- `flush` *Insider* Boolean  
+		if true this texture will updated in next uni() call.  
+		use when texture refresh is needed.  
+		default is `true` .  
+		example:
+		```js
+		this.tex([{name:'texture0',flush:true}]);
+		```  
 
 ### frame buffer
 #### buffer
@@ -133,6 +157,60 @@ after recompiled, running defUni is necessary.
 ```js
 this.uni(prgName, unis)
 ```
+- `prgName` prgName:String  
+	specify program to get uniform location with prgName.
+- `unis` Array  
+	can be combined
+	- float, vec, int…
+		```js
+		[{loc, data, type}...]
+		```
+		- `loc` ulocName:String  
+			specify uniform location name with String.
+		- `data` Array  
+			defines uniform data with Array.
+		- `type` String  
+			defines uniforms type with String.  
+			specify `f`(float,vec) or `i`(int).
+	- texture
+		```js
+		[{loc, data, rname}...]
+		```
+		- `loc` ulocName:String  
+			specify uniform location name with String.
+		- `data` texName:String  
+			specify texture name with Array.
+		- `rname` *Optional* ulocName:String  
+			specify uniform location name with String.  
+			for texture size (vec2).
 
 ### draw
+#### draw
+```js
+	this.draw(prgName, atts, ibo, clear, buf, mode)//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName(, cl:Boolean, buf:bufName, mode: glDrawMode)
+```
+- `prgName` prgName:String  
+	specify program to get uniform location with prgName.
+- `atts` Array  
+	```js
+	[{loc, att}...],
+	```
+	- `loc` alocName:String  
+		specify attribute location.
+	- `att` attName:String
+		specify attribute for the attribute location.
+- `ibo` iboName:String  
+	specify ibo matches for atts.
+- `clear` *Optional* Boolean  
+	defines clear canvas(or buffer) or not.  
+	default is `true`.
+- `buf` *Optionl* bufName  
+	specify target buffer name.
+	falsy value to draw canvas.
+- `mode` *Optional* glDrawMode  
+	defines drawmode with String.  
+	default is `TRIANGLES`.
+
+
 ## example
+see index.html

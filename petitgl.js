@@ -1,4 +1,4 @@
-//build: 2109140
+//build: 2109200
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
@@ -28,16 +28,15 @@ class PetitGL{
 		return{sta:gl.getProgramParameter(prg,gl.LINK_STATUS),dat:prg,log:gl.getProgramInfoLog(prg)};
 	}
 	_mip(gl,w,h){
-		if(((w&(w-1))==0)&&((h&(h-1))==0))gl.generateMipmap(gl.TEXTURE_2D);
+		if(((w&(w-1))==0&&w)&&((h&(h-1))==0&&h))gl.generateMipmap(gl.TEXTURE_2D);
 		else{
-			console.log('mipmap canceled');
 			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
 		}
 		gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
 	}
-	compile(pn,vsh,fsh){//pn: prgName, vsh:String, fsh:String
+	compile(pn,vsh,fsh){
 		this.log='';
 		if(typeof vsh=='string')vsh=this._sh(this.gl,'VERTEX_SHADER',vsh);
 		if(typeof fsh=='string')fsh=this._sh(this.gl,'FRAGMENT_SHADER',fsh);
@@ -49,26 +48,25 @@ class PetitGL{
 		};
 		return this;
 	}
-	tex(texs){//texs: [...{name:texName,url:String,fx(tex,size)}]
-		const gl=this.gl;
-		for(const x of texs){
-			const img=new Image();
-			img.onload=()=>{
-				const tex=gl.createTexture(),size=[img.naturalWidth,img.naturalHeight];
-				gl.bindTexture(gl.TEXTURE_2D,tex);
-				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
-				gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
-				this._mip(gl,...size);
-				gl.bindTexture(gl.TEXTURE_2D,null);
-				console.log(img,tex,size);
-				this.tex_[x.name]={tex,size};
-				if(x.fx)x.fx(tex,size);
+	tex(texs){
+		const gl=this.gl,
+			fx=x=>{
+				this.tex_[x.name]={...(this.tex_[x.name]||{animate:false,flush:true,tex:gl.createTexture()}),...x};
+				const e=this.tex_[x.name].data;
+				this.tex_[x.name].size=[e.naturalWidth||e.videoWidth||e.width,e.naturalHeight||e.videoHeight||e.height];
 			};
-			img.src=x.url;
+		for(let x of texs){
+			if(x.data.url){
+				let e={img:'img',vid:'video'}[x.data.type];
+				if(!e)throw'unknown type';
+				e=document.createElement(e);
+				e.addEventListener({IMG:'load',VIDEO:'canplaythrough'}[e.tagName],()=>{if(e.play)e.play();fx({...x,data:e});if(x.data.fx)x.data.fx(e);},{once:true});
+				e.src=x.data.url;e.muted=true;e.loop=true;
+			}else fx(x);
 		}
 		return this;
 	}
-	buffer(bufs){//buffs: [...{name:bufName,tex:texName(,w:Int,h:Int)}]
+	buffer(bufs){
 		const gl=this.gl;
 		for(const x of bufs){
 			const f=gl.createFramebuffer(),d=gl.createRenderbuffer(),t=gl.createTexture(),w=x.w||this.c.width,h=x.h||this.c.height;
@@ -89,13 +87,13 @@ class PetitGL{
 		}
 		return this;
 	}
-	defAtt(pn,alocs){//pn: prgName, alocs: [...alocName]
+	defAtt(pn,alocs){
 		const tmp={};
 		for(const x of alocs)tmp[x]=this.gl.getAttribLocation(this.prg_[pn].dat,x);
 		this.aloc_[pn]=tmp;
 		return this;
 	}
-	att(atts){//atts: [...{name:attName,data:Array,slice:Int}]
+	att(atts){
 		const gl=this.gl;
 		for(const x of atts){
 			if(!this.att_[x.name])this.att_[x.name]={dat:gl.createBuffer()};
@@ -106,7 +104,7 @@ class PetitGL{
 		}
 		return this;
 	}
-	ibo(ibos){//ibos: [...{name:iboName,data:Array}]
+	ibo(ibos){
 		const gl=this.gl;
 		for(const x of ibos){
 			if(!this.ibo_[x.name])this.ibo_[x.name]={dat:gl.createBuffer()};
@@ -117,13 +115,13 @@ class PetitGL{
 		}
 		return this;
 	}
-	defUni(pn,ulocs){//pn: prgName, ulocs: [...ulocName]
+	defUni(pn,ulocs){
 		const tmp={};
 		for(const x of ulocs)tmp[x]=this.gl.getUniformLocation(this.prg_[pn].dat,x);
 		this.uloc_[pn]=tmp;
 		return this;
 	}
-	uni(pn,unis){//unis: [...{loc:ulocName,data:Array||texName,(type:String,rname:ulocName)}]
+	uni(pn,unis){
 		const gl=this.gl,
 			fim={
 				0:{},
@@ -135,17 +133,23 @@ class PetitGL{
 		for(const x of unis){
 			if(fim[x.type||0][x.data.length])gl[fim[x.type][x.data.length]](this.uloc_[pn][x.loc],...(x.type=='m'?[false,x.data]:[x.data]));
 			else if(typeof x.data=='string'){
-				if(!this.tex_[x.data])continue;
+				const tex=this.tex_[x.data];if(!tex)continue;
 				gl.activeTexture(gl['TEXTURE'+texi]);
-				gl.bindTexture(gl.TEXTURE_2D,this.tex_[x.data].tex);
+				gl.bindTexture(gl.TEXTURE_2D,tex.tex);
+				if(tex.animate||tex.flush){
+					tex.flush=false;
+					gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+					gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,tex.data);
+					this._mip(gl,...tex.size);
+				}
 				gl.uniform1i(this.uloc_[pn][x.loc],texi);
-				if(x.rname)gl.uniform2fv(this.uloc_[pn][x.rname],this.tex_[x.data].size);
+				if(x.rname)gl.uniform2fv(this.uloc_[pn][x.rname],tex.size);
 				texi++;
 			}else throw x;
 		}
 		return this;
 	}
-	draw(pn,atts,ibo,cl=1,buf,mode='TRIANGLES'){//pn: prgName, atts: [...{loc:alocName,att:attName}], ibo: iboName(, cl:Boolean, buf:bufName, mode: glDrawMode)
+	draw(pn,atts,ibo,cl=1,buf,mode='TRIANGLES'){
 		const gl=this.gl;
 		gl.useProgram(this.prg_[pn].dat);
 		if(buf)gl.bindFramebuffer(gl.FRAMEBUFFER,this.buf_[buf].f);
