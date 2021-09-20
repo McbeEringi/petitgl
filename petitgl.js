@@ -1,4 +1,4 @@
-//build: 2109201
+//build: 2109202
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
@@ -60,7 +60,7 @@ class PetitGL{
 				let e={img:'img',vid:'video'}[x.data.type];
 				if(!e)throw'unknown type';
 				e=document.createElement(e);
-				e.addEventListener({IMG:'load',VIDEO:'canplaythrough'}[e.tagName],()=>{if(e.play)e.play();fx({...x,data:e});if(x.data.fx)x.data.fx({...x,data:e});},{once:true});
+				e.addEventListener({IMG:'load',VIDEO:'canplaythrough'}[e.tagName],()=>{if(e.play)e.play();fx({...x,data:e});if(x.data.fx)x.data.fx(this.tex_[x.name]);},{once:true});
 				e.src=x.data.url;e.muted=true;e.loop=true;
 			}else fx(x);
 		}
