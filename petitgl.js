@@ -56,7 +56,7 @@ class PetitGL{
 				this.tex_[x.name].size=[e.naturalWidth||e.videoWidth||e.width,e.naturalHeight||e.videoHeight||e.height];
 			};
 		for(let x of texs){
-			if(x.data.url){
+			if((x.data||{}).url){
 				let e={img:'img',vid:'video'}[x.data.type];
 				if(!e)throw'unknown type';
 				e=document.createElement(e);
