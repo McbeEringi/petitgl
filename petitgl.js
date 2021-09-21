@@ -1,4 +1,4 @@
-//build: 2109202
+//build: 2109210
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
@@ -13,7 +13,7 @@ class PetitGL{
 		if(this.gl.getExtension('OES_standard_derivatives'))console.log('OES_standard_derivatives');
 		return this;
 	}
-	resize(w,h){this.c.width=w;this.c.height=h;this.gl.viewport(0,0,this.c.width,this.c.height);return this;}
+	resize(w,h){this.c.width=w;this.c.height=h;return this;}
 	_sh(gl,type,src){
 		const sh=gl.createShader(gl[type]);
 		gl.shaderSource(sh,'#define round(x) floor(x+.5)\n'+src);
@@ -81,7 +81,7 @@ class PetitGL{
 			gl.bindTexture(gl.TEXTURE_2D,null);
 			gl.bindRenderbuffer(gl.RENDERBUFFER,null);
 			gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-			this.buf_[x.name]={f,d,t};
+			this.buf_[x.name]={f,d,t,w,h};
 			if(this.tex_[x.tex])console.log(`${this.tex_[x.tex]} is overwritten by buffer ${x.name}.`);
 			this.tex_[x.tex]={tex:t,size:[w,h]};
 		}
@@ -154,6 +154,7 @@ class PetitGL{
 		gl.useProgram(this.prg_[pn].dat);
 		if(buf)gl.bindFramebuffer(gl.FRAMEBUFFER,this.buf_[buf].f);
 		if(cl)gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.clearColor(...this.col);gl.clearDepth(1);
+		this.gl.viewport(0,0,buf?this.buf_[buf].w:this.c.width,buf?this.buf_[buf].h:this.c.height);
 		for(const x of atts){
 			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.att].dat);
 			gl.enableVertexAttribArray(this.aloc_[pn][x.loc]);
