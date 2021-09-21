@@ -42,8 +42,8 @@ class PetitGL{
 		if(typeof fsh=='string')fsh=this._sh(this.gl,'FRAGMENT_SHADER',fsh);
 		if(vsh.sta&&fsh.sta)this.prg_[pn]=this._prg(this.gl,vsh.dat,fsh.dat);
 		else{
-			if(vsh.sta)this.log+=`${pn}_vsh:\n${vsh.log}\n`;
-			if(fsh.sta)this.log+=`${pn}_vsh:\n${fsh.log}\n`;
+			if(!vsh.sta)this.log+=`${pn}_vsh:\n${vsh.log}\n`;
+			if(!fsh.sta)this.log+=`${pn}_vsh:\n${fsh.log}\n`;
 			this.log+='\n';
 		};
 		return this;
