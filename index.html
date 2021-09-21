@@ -19,97 +19,98 @@
 			a:link,a:visited{color:#aef;}a:hover{color:#8af;}a:active{color:#48f;}
 			canvas{position:fixed;top:0;left:0;z-index:-1;width:100vw;height:100vh;object-fit:cover;}
 			[alt=icon]{background-color:#fff;width:100%;max-width:320px;border-radius:25%;}
-			pre{background-color:#222;padding:12px;}code{background-color:#222;}
+			pre{background-color:#222;padding:12px;white-space:pre-wrap;word-break:break-all;}code{background-color:#222;}
 		</style>
 		<script src="petitgl.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/atom-one-dark.min.css" media="print" onload="this.media='all';">
+<script id="src">
+let btex;
+const main=new PetitGL(undefined,[0,0,0,1])
+	.resize(innerWidth,innerHeight)
+	.tex([
+		{name:'texture0',data:{url:'img/icon.png',type:'img'}}
+	])
+	.buffer([
+		{name:'buff0',tex:'btex0'},
+		{name:'buff1',tex:'btex1'}
+	])
+	.att([
+		{name:'_uv',data:[-1,-1, 1,-1, -1,1, 1,1],slice:2}
+	])
+	.ibo([
+		{name:'ibo',data:[0,1,2, 3,2,1]}
+	])
+	.compile(
+		'test',//program name
+		`attribute vec2 UV;
+		void main(){
+			gl_Position=vec4(UV,0,1);
+		}`,//vsh
+		`precision highp float;
+		uniform float time;
+		uniform vec2 res;
+		uniform sampler2D tex0;
+		uniform vec2 tex0res;
+		uniform sampler2D buffer;
+		float hash12(vec2 p){
+			vec3 p3=fract(vec3(p.xyx)*.1031);
+			p3+=dot(p3,p3.yzx+33.33);
+			return fract((p3.x+p3.y)*p3.z);
+		}
+		mat2 rot(float r){return mat2(cos(r),sin(r),-sin(r),cos(r));}
+		void main(){
+			const float pi=3.141593;
+			vec4 prev=texture2D(buffer,gl_FragCoord.xy/res);
+			vec2 p=gl_FragCoord.xy/tex0res+vec2(time*pi*.5+cos(time*pi),sin(time*pi)+time*pi*.5*res.y/res.x)*.05;
+			p=p*2.*rot(pi/6.);
+			float r=floor(hash12(floor(p)+1024.)*4.)*.5*pi;
+			p=(p-floor(p)-.5)*rot(r)+floor(p)+.5;
+			vec4 now=texture2D(tex0,fract(p));
+			now.a*=hash12(floor(p)-1024.);
+			gl_FragColor=mix(prev*.98,now,now.a);
+		}`//fsh
+	)
+	.defAtt(
+		'test',
+		[
+			'UV'
+		]
+	)
+	.defUni(
+		'test',
+		[
+			'time',
+			'tex0',
+			'tex0res',
+			'res',
+			'buffer',
+		]
+	),
+	loop=()=>{
+		requestAnimationFrame(loop);
+		main
+		.uni(
+			'test',
+			[
+				{loc:'time',data:[(Date.now()*.001)%86400-43200],type:'f'},
+				{loc:'tex0',data:'texture0',rname:'tex0res'},
+				{loc:'res',data:[main.c.width,main.c.height],type:'f'},
+				{loc:'buffer',data:'btex'+Number(btex)}
+			]
+		)
+		.draw('test',[{loc:'UV',att:'_uv'}],'ibo').flush()
+		.draw('test',[{loc:'UV',att:'_uv'}],'ibo',true,'buff'+Number(!btex));
+		btex=!btex;
+	};
+loop();
+document.body.appendChild(main.c);
+</script>
 		<script>
 		marked.setOptions({highlight:(c,l)=>hljs.highlightAuto(c,[l]).value});
 		fetch('README.md').then(x=>x.text()).then(x=>document.body.insertAdjacentHTML('afterbegin',marked(x)));
-		let btex;
-			const t0=new Date();
-				main=new PetitGL(undefined,[0,0,0,1])
-				.resize(innerWidth,innerHeight)
-				.tex([
-					{name:'texture0',data:{url:'img/icon.png',type:'img'}}
-				])
-				.buffer([
-					{name:'buff0',tex:'btex0'},
-					{name:'buff1',tex:'btex1'}
-				])
-				.att([
-					{name:'_uv',data:[-1,-1, 1,-1, -1,1, 1,1],slice:2}
-				])
-				.ibo([
-					{name:'ibo',data:[0,1,2, 3,2,1]}
-				])
-				.compile(
-					'test',//program name
-					`attribute vec2 UV;
-					void main(){
-						gl_Position=vec4(UV,0,1);
-					}`,//vsh
-					`precision highp float;
-					uniform float time;
-					uniform vec2 res;
-					uniform sampler2D tex0;
-					uniform vec2 tex0res;
-					uniform sampler2D buffer;
-					float hash12(vec2 p){
-						vec3 p3=fract(vec3(p.xyx)*.1031);
-						p3+=dot(p3,p3.yzx+33.33);
-						return fract((p3.x+p3.y)*p3.z);
-					}
-					mat2 rot(float r){return mat2(cos(r),sin(r),-sin(r),cos(r));}
-					void main(){
-						const float pi=3.141593;
-						vec4 prev=texture2D(buffer,gl_FragCoord.xy/res);
-						vec2 p=gl_FragCoord.xy/tex0res+vec2(time*pi*.5+cos(time*pi),sin(time*pi)+time*pi*.5*res.y/res.x)*.05;
-						p=p*2.*rot(pi/6.);
-						float r=floor(hash12(floor(p)+1024.)*4.)*.5*pi;
-						p=(p-floor(p)-.5)*rot(r)+floor(p)+.5;
-						vec4 now=texture2D(tex0,fract(p));
-						now.a*=hash12(floor(p)-1024.);
-						gl_FragColor=mix(prev*.98,now,now.a);
-					}`//fsh
-				)
-				.defAtt(
-					'test',
-					[
-						'UV'
-					]
-				)
-				.defUni(
-					'test',
-					[
-						'time',
-						'tex0',
-						'tex0res',
-						'res',
-						'buffer',
-					]
-				),
-				loop=()=>{
-					requestAnimationFrame(loop);
-					main
-					.uni(
-						'test',
-						[
-							{loc:'time',data:[(new Date()-t0)*.001],type:'f'},
-							{loc:'tex0',data:'texture0',rname:'tex0res'},
-							{loc:'res',data:[main.c.width,main.c.height],type:'f'},
-							{loc:'buffer',data:'btex'+Number(btex)}
-						]
-					)
-					.draw('test',[{loc:'UV',att:'_uv'}],'ibo').flush()
-					.draw('test',[{loc:'UV',att:'_uv'}],'ibo',true,'buff'+Number(!btex));
-					btex=!btex;
-				};
-		loop();
-		document.body.appendChild(main.c);
-		//onresize=()=>main.resize(innerWidth,innerHeight).buffer([{name:'buff0',tex:'btex0'},{name:'buff1',tex:'btex1'}]);
+		document.body.insertAdjacentHTML('beforeend',`<pre id="demosrc"><code>${hljs.highlight(src.textContent,{language:'js'}).value}</code></pre>`);
 		</script>
 	</body>
 </html>

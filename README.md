@@ -21,9 +21,9 @@ new PetitGL(canvas, color);
 this.resize(width, height);
 ```
 - `width` Number  
-	defines width with Number.  
+	defines canvas width with Number.  
 - `height` Number  
-	defines height with Number.  
+	defines canvas height with Number.  
 
 ### create program
 #### compile
