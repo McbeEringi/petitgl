@@ -149,7 +149,7 @@ class PetitGL{
 		}
 		return this;
 	}
-	draw(pn,atts,ibo,cl=1,buf,mode='TRIANGLES'){
+	draw(pn,atts=[],ibo,cl=1,buf,mode='TRIANGLES'){
 		const gl=this.gl;
 		gl.useProgram(this.prg_[pn].dat);
 		if(buf)gl.bindFramebuffer(gl.FRAMEBUFFER,this.buf_[buf].f);
