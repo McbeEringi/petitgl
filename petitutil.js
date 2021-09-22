@@ -39,11 +39,11 @@ class PetitM4{
 		]);
 	}
 	roteul(t=[0,0,0]){
-		t=t.map(x=>[cos(x),sin(x)]);
+		t=t.map(x=>[Math.cos(x),Math.sin(x)]);
 		return this
-			.mul([t[0],t[1],0,0, -t[1],t[0],0,0, 0,0,1,0, 0,0,0,1])
-			.mul([t[0],0,t[1],0, 0,1,0,0, -t[1],0,t[0],0, 0,0,0,1])
-			.mul([1,0,0,0, 0,t[0],t[1],0, 0,-t[1],t[0],0, 0,0,0,1]);
+			.mul([t[2][0],t[2][1],0,0, -t[2][1],t[2][0],0,0, 0,0,1,0, 0,0,0,1])
+			.mul([t[1][0],0,t[1][1],0, 0,1,0,0, -t[1][1],0,t[1][0],0, 0,0,0,1])
+			.mul([1,0,0,0, 0,t[0][0],t[0][1],0, 0,-t[0][1],t[0][0],0, 0,0,0,1]);
 	}
 	lookat(c=[0,0,1],o=[0,0,0],u=[0,1,0]){
 		this.translate(o.map((x,i)=>x-c[i]));
@@ -72,18 +72,36 @@ class PetitQ{
 			a[0]*b[0]-a[1]*b[1]-a[2]*b[2]-a[3]*b[3],
 			a[0]*b[1]+a[1]*b[0]+a[2]*b[3]-a[3]*b[2],
 			a[0]*b[2]-a[1]*b[3]+a[2]*b[0]+a[3]*b[1],
-			a[0]*b[3]+a[1]*b[2]-a[2]*b[1]-a[3]*b[0]
+			a[0]*b[3]+a[1]*b[2]-a[2]*b[1]+a[3]*b[0]
 		]);
 		return this;
 	}
 	norm(){this.main.set(this._norm(this.main));return this;}
 	inv(){this.main.set(this.main.map((x,i)=>i?-x:x));return this;}
-	rot(a=[1,0,0],t){
-		const s=Math.sin(t*.5),c=Math.cos(t*.5);a=this._norm(a);
-		return this.mul([c,...a.map(x=>x*s)]);
+	rot(a=[0,0,0],t=1){const s=Math.sin(t*.5),c=Math.cos(t*.5);a=this._norm(a);return this.mul([c,...a.map(x=>x*s)]);}
+	roteul(t=[0,0,0]){
+		t=t.map(x=>[Math.cos(x*.5),Math.sin(x*.5)]);
+		return this.mul([
+			t[2][0]*t[1][0]*t[0][0]+t[2][1]*t[1][1]*t[0][1],
+			t[2][1]*t[1][0]*t[0][0]-t[2][0]*t[1][1]*t[0][1],
+			t[2][0]*t[1][1]*t[0][0]+t[2][1]*t[1][0]*t[0][1],
+			t[2][0]*t[1][0]*t[0][1]-t[2][1]*t[1][1]*t[0][0]
+		]);
 	}
-	roteul(){}
-	mix(){}
-	vec3(){}
+	slerp(q=[1,0,0,0],x=.5){
+		q=q.main||q;
+		const ht=[...this.main].reduce((a,y,i)=>a+y*q[i],0);
+		let hs=1-ht*ht,t=[.5,.5];
+		if(hs>0){
+			hs=Math.sqrt(hs);
+			if(!Math.abs(hs)<.0001){
+				const ph=Math.acos(ht);
+				t=[Math.sin(ph*(1-x))/hs,Math.sin(ph*x)/hs];
+			}
+			this.main.set(this.main.map((y,i)=>y*t[0]+q[i]*t[1]));
+		}
+		return this;
+	}
+	vec3(v=[0,1,0]){}
 	PetitM4(){}
 }
