@@ -30,8 +30,14 @@ class PetitMat{
 			y=x.map((x,i)=>x*z[i]);
 		return this.mul([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,0,0,0,1]);
 	}
-	pers(){}
-	ortho(){}
+	pers(f,r,n,f){
+		const t=n*Math.tan(f*Math.PI/360),d=f-n;
+		return this.mul([n/(t*r),0,0,0, 0,n/t,0,0, 0,0,-(f+n)/d,-1, 0,0,-(f*n*2)/d,0]);
+	}
+	ortho(l,r,t,b,n,f){
+		const w=r-l,h=t-b,d=f-n;
+		return this.mul([2/w,0,0,0, 0,2/h,0,0, 0,0,-2/d,0, -(l+r)/w,-(t+b)/h,-(f+n)/d,1]);
+	}
 	transpose(){
 		this.main=new Float32Array(16).map((_,i)=>this.main[[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15][i]]);
 		return this;
