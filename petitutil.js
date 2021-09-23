@@ -67,6 +67,7 @@ class PetitQ{
 	constructor(x){return this.init(x);}
 	init(x=[1,0,0,0]){this.main=new Float32Array(x);return this;}
 	copy(){return new PetitQ(this.main);}
+	getim(){return [...this.main].slice(1);}
 	_norm(x){const l=Math.sqrt([...x].reduce((a,y)=>a+y*y,0));return l?x.map(y=>y/l):x;}
 	mul(x){
 		const a=this.main,b=(x||this).main||x;
@@ -100,10 +101,16 @@ class PetitQ{
 		}
 		return this;
 	}
-	vec3(v=[0,0,1]){return [...this.copy().conj().mul([0,...v]).mul(this).main].slice(1);}
+	vec3(v=[0,0,1]){return this.copy().conj().mul([0,...v]).mul(this).getim();}
 	PetitM4(){
 		const q=this.main,x=q[1]+q[1],y=q[2]+q[2],z=q[3]+q[3],
 			xx=q[1]*x,xy=q[1]*y,xz=q[1]*z,yy=q[2]*y,yz=q[2]*z,zz=q[3]*z, wx=q[0]*x,wy=q[0]*y,wz=q[0]*z;
 		return new PetitM4([1-yy-zz,xy-wz,xz+wy,0, xy+wz,1-xx-zz,yz-wx,0, xz-wy,yz+wx,1-xx-yy,0, 0,0,0,1]);
+	}
+}
+
+class PetitPrim{
+	constructor(){
+
 	}
 }
