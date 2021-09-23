@@ -6,13 +6,13 @@ class PetitM4{
 	_norm(x){const l=Math.sqrt([...x].reduce((a,y)=>a+y*y,0));return l?x.map(y=>y/l):x;}
 	mul(x){
 		const a=this.main,b=(x||this).main||x;
-		this.main.set(new Array(16).map((_,i)=>
-			new Array(4).reduce((ac,x,j)=>ac+a[i%4+j*4]*b[Math.floor(i/4)+j])
+		this.main.set(new Array(16).fill().map((_,i)=>
+			new Array(4).fill().reduce((ac,x,j)=>ac+a[i%4+j*4]*b[Math.floor(i/4)+j])
 		));
 		return this;
 	}
 	transpose(){
-		this.main.set(new Array(16).map((_,i)=>this.main[[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15][i]]));
+		this.main.set(new Array(16).fill().map((_,i)=>this.main[[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15][i]]));
 		return this;
 	}
 	inv(x){
@@ -67,7 +67,7 @@ class PetitQ{
 	constructor(x){return this.init(x);}
 	init(x=[1,0,0,0]){this.main=new Float32Array(x);return this;}
 	copy(){return new PetitQ(this.main);}
-	getim(){return [...this.main].slice(1);}
+	getIm(){return [...this.main].slice(1);}
 	_norm(x){const l=Math.sqrt([...x].reduce((a,y)=>a+y*y,0));return l?x.map(y=>y/l):x;}
 	mul(x){
 		const a=this.main,b=(x||this).main||x;
@@ -101,7 +101,7 @@ class PetitQ{
 		}
 		return this;
 	}
-	vec3(v=[0,0,1]){return this.copy().conj().mul([0,...v]).mul(this).getim();}
+	vec3(v=[0,0,1]){return this.copy().conj().mul([0,...v]).mul(this).getIm();}
 	PetitM4(){
 		const q=this.main,x=q[1]+q[1],y=q[2]+q[2],z=q[3]+q[3],
 			xx=q[1]*x,xy=q[1]*y,xz=q[1]*z,yy=q[2]*y,yz=q[2]*z,zz=q[3]*z, wx=q[0]*x,wy=q[0]*y,wz=q[0]*z;
@@ -109,8 +109,47 @@ class PetitQ{
 	}
 }
 
-class PetitPrim{
-	constructor(){
+const cube=(x=1,c)=>{
+	const n=[
+		-1,-1,1,1,-1,1,1,1,1,-1,1,1, -1,-1,-1,-1,1,-1,1,1,-1,1,-1,-1, -1,1,-1,-1,1,1,1,1,1,1,1,-1,
+		-1,-1,-1,1,-1,-1,1,-1,1,-1,-1,1, 1,-1,-1,1,1,-1,1,1,1,1,-1,1, -1,-1,-1,-1,-1,1,-1,1,1,-1,1,-1
+	];
+	return{
+		p:n.map(y=>y*x),n,
+		c:new Array(6).fill().map((_,i)=>new Array(4).fill(c||[...hsv(i/6),1])).flat(2),
+		t:new Array(6).fill([0,0,1,0,1,1,0,1]).flat(),
+		i:new Array(6).fill().map((_,i)=>{i*=4;return [0,1,2,0,2,3].map(y=>y+i);}).flat()
+	};
+},
+icosph=(x=1,c,s=2)=>{
 
-	}
-}
+},
+sphere=(x=1,c,sx=16,sy=sx*2)=>{
+	x=new Array(sx+1).fill().map((_,i)=>{
+		i/=sx;let is=-Math.PI*(i-.5),ic=Math.cos(is);is=Math.sin(is);
+		return new Array(sy+1).fill().map((_,j)=>{
+			j/=sy;let js=2*Math.PI*j,jc=Math.cos(js);js=Math.sin(js);
+			return [[ic*jc*x,is*x,ic*js*x],[ic*jc,is,ic*js],c||[...hsv(i),1],[1-j,1-i]];
+		})
+	}).flat();
+	x=x[0].map((_,i)=>x.map(y=>y[i]).flat());
+	return{
+		p:x[0],n:x[1],c:x[2],t:x[3],
+		i:new Array(sx*sy+sx-1).fill().map((_,i)=>[0,1,sy+1,sy+2,sy+1,1].map(y=>y+i)).flat()
+	};
+},
+torus=(x=1,c,sx=16,sy=sx*2)=>{
+	x=new Array(sx+1).fill().map((_,i)=>{
+		i/=sx;let is=2*Math.PI*i,ic=Math.cos(is);is=Math.sin(is);
+		return new Array(sy+1).fill().map((_,j)=>{
+			j/=sy;let js=2*Math.PI*j,jc=Math.cos(js);js=Math.sin(js);
+			return [[(ic-2)*jc*x,is*x,(ic-2)*js*x],[ic*jc,is,ic*js],c||[...hsv(j),1],[1-j,1-i]];
+		})
+	}).flat();
+	x=x[0].map((_,i)=>x.map(y=>y[i]).flat());
+	return{
+		p:x[0],n:x[1],c:x[2],t:x[3],
+		i:new Array(sx*sy+sx-1).fill().map((_,i)=>[0,1,sy+1,sy+2,sy+1,1].map(y=>y+i)).flat()
+	};
+},
+hsv=(h=0,s=1,v=1)=>{h*=6;const f=h%1;return[[0,3,1],[2,0,1],[1,0,3],[1,2,0],[3,1,0],[0,1,2]][Math.floor(h)%6].map(x=>v*(1-s*[0,1,f,1-f][x]));};
