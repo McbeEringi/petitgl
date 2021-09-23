@@ -1,6 +1,7 @@
 class PetitM4{
 	constructor(x){return this.init(x);}
 	init(x=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]){this.main=new Float32Array(x);return this;}
+	copy(){return new PetitM4(this.main);}
 	get(){return this.main;}
 	_norm(x){const l=Math.sqrt([...x].reduce((a,y)=>a+y*y,0));return l?x.map(y=>y/l):x;}
 	mul(x){
@@ -65,6 +66,7 @@ class PetitM4{
 class PetitQ{
 	constructor(x){return this.init(x);}
 	init(x=[1,0,0,0]){this.main=new Float32Array(x);return this;}
+	copy(){return new PetitQ(this.main);}
 	_norm(x){const l=Math.sqrt([...x].reduce((a,y)=>a+y*y,0));return l?x.map(y=>y/l):x;}
 	mul(x){
 		const a=this.main,b=(x||this).main||x;
@@ -77,7 +79,7 @@ class PetitQ{
 		return this;
 	}
 	norm(){this.main.set(this._norm(this.main));return this;}
-	inv(){this.main.set(this.main.map((x,i)=>i?-x:x));return this;}
+	conj(){this.main.set(this.main.map((x,i)=>i?-x:x));return this;}
 	rot(a=[0,0,0],t=1){const s=Math.sin(t*.5),c=Math.cos(t*.5);a=this._norm(a);return this.mul([c,...a.map(x=>x*s)]);}
 	roteul(t=[0,0,0]){
 		t=t.map(x=>[Math.cos(x*.5),Math.sin(x*.5)]);
@@ -90,18 +92,18 @@ class PetitQ{
 	}
 	slerp(q=[1,0,0,0],x=.5){
 		q=q.main||q;
-		const ht=[...this.main].reduce((a,y,i)=>a+y*q[i],0);
-		let hs=1-ht*ht,t=[.5,.5];
-		if(hs>0){
-			hs=Math.sqrt(hs);
-			if(!Math.abs(hs)<.0001){
-				const ph=Math.acos(ht);
-				t=[Math.sin(ph*(1-x))/hs,Math.sin(ph*x)/hs];
-			}
-			this.main.set(this.main.map((y,i)=>y*t[0]+q[i]*t[1]));
+		let a=[...this.main].reduce((a,y,i)=>a+y*q[i],0),b=1-a*a;
+		if(b>0){
+			a=Math.acos(a);b=Math.sqrt(b);
+			x=(b<.0001?[.5,.5]:[Math.sin(a*(1-x))/b,Math.sin(a*x)/b]);
+			this.main.set(this.main.map((y,i)=>y*x[0]+q[i]*x[1]));
 		}
 		return this;
 	}
-	vec3(v=[0,1,0]){}
-	PetitM4(){}
+	vec3(v=[0,0,1]){return [...this.copy().conj().mul([0,...v]).mul(this).main].slice(1);}
+	PetitM4(){
+		const q=this.main,x=q[1]+q[1],y=q[2]+q[2],z=q[3]+q[3],
+			xx=q[1]*x,xy=q[1]*y,xz=q[1]*z,yy=q[2]*y,yz=q[2]*z,zz=q[3]*z, wx=q[0]*x,wy=q[0]*y,wz=q[0]*z;
+		return new PetitM4([1-yy-zz,xy-wz,xz+wy,0, xy+wz,1-xx-zz,yz-wx,0, xz-wy,yz+wx,1-xx-yy,0, 0,0,0,1]);
+	}
 }
