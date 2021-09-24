@@ -118,11 +118,8 @@ const cube=(x=1,c)=>{
 		p:n.map(y=>y*x),n,
 		c:new Array(6).fill().map((_,i)=>new Array(4).fill(c||[...hsv(i/6),1])).flat(2),
 		t:new Array(6).fill([0,0,1,0,1,1,0,1]).flat(),
-		i:new Array(6).fill().map((_,i)=>{i*=4;return [0,1,2,0,2,3].map(y=>y+i);}).flat()
+		i:new Array(6).fill().map((_,i)=>{i*=4;return[0,1,2,0,2,3].map(y=>y+i);}).flat()
 	};
-},
-icosph=(x=1,c,s=2)=>{
-
 },
 sphere=(x=1,c,sx=16,sy=sx*2)=>{
 	x=new Array(sx+1).fill().map((_,i)=>{
