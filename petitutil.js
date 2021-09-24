@@ -126,30 +126,24 @@ icosph=(x=1,c,s=2)=>{
 },
 sphere=(x=1,c,sx=16,sy=sx*2)=>{
 	x=new Array(sx+1).fill().map((_,i)=>{
-		i/=sx;let is=-Math.PI*(i-.5),ic=Math.cos(is);is=Math.sin(is);
+		let ip=i/sx,is=-Math.PI*(ip-.5),ic=Math.cos(is);is=Math.sin(is);
 		return new Array(sy+1).fill().map((_,j)=>{
-			j/=sy;let js=2*Math.PI*j,jc=Math.cos(js);js=Math.sin(js);
-			return [[ic*jc*x,is*x,ic*js*x],[ic*jc,is,ic*js],c||[...hsv(i),1],[1-j,1-i]];
+			let jp=j/sy,js=2*Math.PI*jp,jc=Math.cos(js),k=i*(sy+1)+j;js=Math.sin(js);
+			return[[ic*jc*x,is*x,ic*js*x],[ic*jc,is,ic*js],c||[...hsv(ip),1],[1-jp,1-ip],i==sx||j==sy?[]:[k,1+k,sy+1+k,sy+2+k,sy+1+k,1+k]];
 		})
 	}).flat();
 	x=x[0].map((_,i)=>x.map(y=>y[i]).flat());
-	return{
-		p:x[0],n:x[1],c:x[2],t:x[3],
-		i:new Array(sx*sy+sx-1).fill().map((_,i)=>[0,1,sy+1,sy+2,sy+1,1].map(y=>y+i)).flat()
-	};
+	return{p:x[0],n:x[1],c:x[2],t:x[3],i:x[4]};
 },
 torus=(x=1,c,sx=16,sy=sx*2)=>{
 	x=new Array(sx+1).fill().map((_,i)=>{
-		i/=sx;let is=2*Math.PI*i,ic=Math.cos(is);is=Math.sin(is);
+		let ip=i/sx,is=2*Math.PI*ip,ic=Math.cos(is);is=Math.sin(is);
 		return new Array(sy+1).fill().map((_,j)=>{
-			j/=sy;let js=2*Math.PI*j,jc=Math.cos(js);js=Math.sin(js);
-			return [[(ic-2)*jc*x,is*x,(ic-2)*js*x],[ic*jc,is,ic*js],c||[...hsv(j),1],[1-j,1-i]];
+			let jp=j/sy,js=2*Math.PI*jp,jc=Math.cos(js),k=i*(sy+1)+j;js=Math.sin(js);
+			return[[(ic-2)*jc*x,is*x,(ic-2)*js*x],[ic*jc,is,ic*js],c||[...hsv(jp),1],[1-jp,1-ip],i==sx||j==sy?[]:[k,1+k,sy+1+k,sy+2+k,sy+1+k,1+k]];
 		})
 	}).flat();
 	x=x[0].map((_,i)=>x.map(y=>y[i]).flat());
-	return{
-		p:x[0],n:x[1],c:x[2],t:x[3],
-		i:new Array(sx*sy+sx-1).fill().map((_,i)=>[0,1,sy+1,sy+2,sy+1,1].map(y=>y+i)).flat()
-	};
+	return{p:x[0],n:x[1],c:x[2],t:x[3],i:x[4]};
 },
 hsv=(h=0,s=1,v=1)=>{h*=6;const f=h%1;return[[0,3,1],[2,0,1],[1,0,3],[1,2,0],[3,1,0],[0,1,2]][Math.floor(h)%6].map(x=>v*(1-s*[0,1,f,1-f][x]));};
