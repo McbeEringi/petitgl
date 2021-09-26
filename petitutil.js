@@ -50,7 +50,7 @@ class PetitM4{
 	lookat(c=[0,0,1],o=[0,0,0],u=[0,1,0]){
 		const cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],
 			z=this._norm(c.map((x,i)=>x-o[i])),x=this._norm(cr(u,z)),y=this._norm(cr(z,x));
-		return this.mul([x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0, ...o.map((x,i)=>x-c[i]),1]);
+		return this.mul([x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0, ...[x,y,z].map(x=>-x.reduce((p,_,i)=>p+x[i]*c[i],0)),1]);
 	}
 	pers(v,r,n,f){
 		const t=n*Math.tan(v*Math.PI/360),d=1/(f-n);
@@ -144,17 +144,17 @@ torus=(x=1,c,sx=16,sy=sx*2)=>{
 obj=(x,col=[1,1,1,1])=>{
 	const v=(x.match(/^v .+$/gm)||[]).map((y,i,a)=>{
 			a=col?col:[...hsv(i/a.length),1];
-			y=y.split(' ').slice(1).map(Number);
+			y=y.split(' ').filter(z=>z).slice(1).map(Number);
 			return({
 				3:()=>[y,a],
 				4:()=>{y[3]=1/x[3];return[y.slice(0,3).map(z=>z*y[3]),a];},
 				6:()=>[y.slice(0,3),[...y.slice(3,6),1]],
 			}[y.length])();
 		}),
-		vt=(x.match(/^vt .+$/gm)||[]).map(y=>y.split(' ',3).slice(1).map(Number)),
-		vn=(x.match(/^vn .+$/gm)||[]).map(y=>y.split(' ',4).slice(1).map(Number));
+		vt=(x.match(/^vt .+$/gm)||[]).map(y=>y.split(' ',3).filter(z=>z).slice(1).map(Number)),
+		vn=(x.match(/^vn .+$/gm)||[]).map(y=>y.split(' ',4).filter(z=>z).slice(1).map(Number));
 	x=(x.match(/^f .+$/gm)||[]).map(y=>{
-		y=y.split(' ').slice(1).map(z=>z.split('/'));
+		y=y.split(' ').filter(z=>z).slice(1).map(z=>z.split('/'));
 		return new Array(y.length-2).fill().map((_,i)=>[y[0],y[1+i],y[2+i]]);
 	}).flat(2).map((y,i)=>[v[y[0]-1][0],y[2]?vn[y[2]-1]:[0,1,0],v[y[0]-1][1],y[1]?vt[y[1]-1]:[0,0],i]);
 	return fmarr(x);
