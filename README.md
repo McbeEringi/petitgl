@@ -180,13 +180,13 @@ A *petit* JS libraries to handle WebGL more easily
 				specify `f`(float,vec) or `i`(int).
 		- texture
 			```js
-			[{loc, data, rname}...]
+			[{loc, data, rloc}...]
 			```
 			- `loc` ulocName:String  
 				specify uniform location name with String.
 			- `data` texName:String  
 				specify texture name with Array.
-			- `rname` *Optional* ulocName:String  
+			- `rloc` *Optional* ulocName:String  
 				specify uniform location name with String.  
 				for texture size (vec2).
 

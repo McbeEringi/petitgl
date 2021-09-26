@@ -143,7 +143,7 @@ class PetitGL{
 					this._mip(gl,...tex.size);
 				}
 				gl.uniform1i(this.uloc_[pn][x.loc],texi);
-				if(x.rname)gl.uniform2fv(this.uloc_[pn][x.rname],tex.size);
+				if(x.rloc)gl.uniform2fv(this.uloc_[pn][x.rloc],tex.size);
 				texi++;
 			}else throw`unknown type ${JSON.stringify(x)}`;
 		}
