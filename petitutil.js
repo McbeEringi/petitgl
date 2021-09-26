@@ -108,7 +108,8 @@ class PetitQ{
 	}
 }
 
-const cube=(x=1,c)=>{
+const fmarr=x=>{x=x[0].map((_,i)=>x.map(y=>y[i]).flat());return{p:x[0],n:x[1],c:x[2],t:x[3],i:x[4]};},
+cube=(x=1,c)=>{
 	const n=[
 		-1,-1,1,1,-1,1,1,1,1,-1,1,1, -1,-1,-1,-1,1,-1,1,1,-1,1,-1,-1, -1,1,-1,-1,1,1,1,1,1,1,1,-1,
 		-1,-1,-1,1,-1,-1,1,-1,1,-1,-1,1, 1,-1,-1,1,1,-1,1,1,1,1,-1,1, -1,-1,-1,-1,-1,1,-1,1,1,-1,1,-1
@@ -128,8 +129,7 @@ sphere=(x=1,c,sx=16,sy=sx*2)=>{
 			return[[ic*jc*x,is*x,ic*js*x],[ic*jc,is,ic*js],c||[...hsv(ip),1],[1-jp,1-ip],i==sx||j==sy?[]:[k,1+k,sy+1+k,sy+2+k,sy+1+k,1+k]];
 		})
 	}).flat();
-	x=x[0].map((_,i)=>x.map(y=>y[i]).flat());
-	return{p:x[0],n:x[1],c:x[2],t:x[3],i:x[4]};
+	return fmarr(x);
 },
 torus=(x=1,c,sx=16,sy=sx*2)=>{
 	x=new Array(sx+1).fill().map((_,i)=>{
@@ -139,7 +139,24 @@ torus=(x=1,c,sx=16,sy=sx*2)=>{
 			return[[(ic-2)*jc*x,is*x,(ic-2)*js*x],[ic*jc,is,ic*js],c||[...hsv(jp),1],[1-jp,1-ip],i==sx||j==sy?[]:[k,1+k,sy+1+k,sy+2+k,sy+1+k,1+k]];
 		})
 	}).flat();
-	x=x[0].map((_,i)=>x.map(y=>y[i]).flat());
-	return{p:x[0],n:x[1],c:x[2],t:x[3],i:x[4]};
+	return fmarr(x);
+},
+obj=(x,col=[1,1,1,1])=>{
+	const v=(x.match(/^v .+$/gm)||[]).map((y,i,a)=>{
+			a=col?col:[...hsv(i/a.length),1];
+			y=y.split(' ').slice(1).map(Number);
+			return({
+				3:()=>[y,a],
+				4:()=>{y[3]=1/x[3];return[y.slice(0,3).map(z=>z*y[3]),a];},
+				6:()=>[y.slice(0,3),[...y.slice(3,6),1]],
+			}[y.length])();
+		}),
+		vt=(x.match(/^vt .+$/gm)||[]).map(y=>y.split(' ',3).slice(1).map(Number)),
+		vn=(x.match(/^vn .+$/gm)||[]).map(y=>y.split(' ',4).slice(1).map(Number));
+	x=(x.match(/^f .+$/gm)||[]).map(y=>{
+		y=y.split(' ').slice(1).map(z=>z.split('/'));
+		return new Array(y.length-2).fill().map((_,i)=>[y[0],y[1+i],y[2+i]]);
+	}).flat(2).map((y,i)=>[v[y[0]-1][0],y[2]?vn[y[2]-1]:[0,1,0],v[y[0]-1][1],y[1]?vt[y[1]-1]:[0,0],i]);
+	return fmarr(x);
 },
 hsv=(h=0,s=1,v=1)=>{h*=6;const f=h%1;return[[0,3,1],[2,0,1],[1,0,3],[1,2,0],[3,1,0],[0,1,2]][Math.floor(h)%6].map(x=>v*(1-s*[0,1,f,1-f][x]));};

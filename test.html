@@ -16,76 +16,78 @@
 		<script src="petitgl.js"></script>
 		<script src="petitutil.js"></script>
 		<script>
-		const model=torus(2),
-			main=new PetitGL(undefined,[0,0,0,1])
-				.resize(1024,1024)
-				.tex([
-					{name:'icon',data:{url:'img/icon.png',type:'img'}}
-				])
-				.att([
-					{name:'p',data:model.p,slice:3},
-					{name:'n',data:model.n,slice:3},
-					{name:'c',data:model.c,slice:4},
-					{name:'t',data:model.t,slice:2},
-				])
-				.ibo([
-					{name:'i',data:model.i}
-				])
-				.compile(
-					'test',//program name
-					`attribute vec3 position;attribute vec3 normal;attribute vec4 color;attribute vec2 uv;
-					uniform mat4 mvp;
-					varying vec4 col;varying vec3 norm;varying vec2 uv_;
-					void main(void){
-						col=color;
-						uv_=uv;
-						norm=normal;
-						gl_Position=mvp*vec4(position,1);
-					}`,//vsh
-					`precision mediump float;
-					uniform float time;uniform vec2 tex0res;uniform sampler2D tex0;uniform mat4 im;
-					varying vec4 col;varying vec3 norm;varying vec2 uv_;
-					void main(void){
-						gl_FragColor=col*vec4(vec3(
-							clamp(
-								dot(norm,normalize(im*vec4(-1,1,1, 0)).xyz),
-							.1,1.)
-						),1);
-					}`//fsh
-				)
-				.defAtt('test',['position','normal','color','uv'])
-				.defUni('test',['time','res','mvp','im','tex0','tex0res']),
-			vp=new PetitM4().lookat([0,0,20],[0,0,0],[0,1,0]).pers(45,main.c.width/main.c.height,.1,100),
-			loop=()=>{
-				requestAnimationFrame(loop);
-				const t=(Date.now()*.001)%86400-43200,
-					m=new PetitM4().rot([0,1,1],t*.5),
-					mvp=m.copy().mul(vp),
-					im=m.copy().inv();
-				main
-				.uni(
-					'test',
-					[
-						{loc:'time',data:[t],type:'f'},
-						{loc:'res',data:[main.c.width,main.c.height],type:'f'},
-						{loc:'mvp',data:mvp.get(),type:'m'},
-						{loc:'im',data:im.get(),type:'m'},
-						{loc:'tex0',data:'icon',rloc:'tex0res'}
-					]
-				)
-				.draw(
-					'test',
-					[
-						{loc:'position',att:'p'},
-						{loc:'normal',att:'n'},
-						{loc:'color',att:'c'},
-						{loc:'uv',att:'t'}
-					],
-					'i'//,true,null,'LINE_STRIP'
-				).flush();
-			};
-		loop();
-		document.body.appendChild(main.c);
+		(async()=>{
+			const model=obj(await(await fetch('test.obj')).text(),0),//torus(2),
+				main=new PetitGL(undefined,[0,0,0,1])
+					.resize(1024,1024)
+					.tex([
+						{name:'icon',data:{url:'img/icon.png',type:'img'}}
+					])
+					.att([
+						{name:'p',data:model.p,slice:3},
+						{name:'n',data:model.n,slice:3},
+						{name:'c',data:model.c,slice:4},
+						{name:'t',data:model.t,slice:2},
+					])
+					.ibo([
+						{name:'i',data:model.i}
+					])
+					.compile(
+						'test',//program name
+						`attribute vec3 position;attribute vec3 normal;attribute vec4 color;attribute vec2 uv;
+						uniform mat4 mvp;
+						varying vec4 col;varying vec3 norm;varying vec2 uv_;
+						void main(void){
+							col=color;
+							uv_=uv;
+							norm=normal;
+							gl_Position=mvp*vec4(position,1);
+						}`,//vsh
+						`precision mediump float;
+						uniform float time;uniform vec2 tex0res;uniform sampler2D tex0;uniform mat4 im;
+						varying vec4 col;varying vec3 norm;varying vec2 uv_;
+						void main(void){
+							gl_FragColor=col*vec4(vec3(
+								clamp(
+									dot(norm,normalize(im*vec4(-1,1,1, 0)).xyz),
+								.1,1.)
+							),1);
+						}`//fsh
+					)
+					.defAtt('test',['position','normal','color','uv'])
+					.defUni('test',['time','res','mvp','im','tex0','tex0res']),
+				vp=new PetitM4().lookat([0,0,20],[0,0,0],[0,1,0]).pers(45,main.c.width/main.c.height,.1,100),
+				loop=()=>{
+					requestAnimationFrame(loop);
+					const t=(Date.now()*.001)%86400-43200,
+						m=new PetitM4().rot([0,1,1],t*.5),
+						mvp=m.copy().mul(vp),
+						im=m.copy().inv();
+					main
+					.uni(
+						'test',
+						[
+							{loc:'time',data:[t],type:'f'},
+							{loc:'res',data:[main.c.width,main.c.height],type:'f'},
+							{loc:'mvp',data:mvp.get(),type:'m'},
+							{loc:'im',data:im.get(),type:'m'},
+							{loc:'tex0',data:'icon',rloc:'tex0res'}
+						]
+					)
+					.draw(
+						'test',
+						[
+							{loc:'position',att:'p'},
+							{loc:'normal',att:'n'},
+							{loc:'color',att:'c'},
+							{loc:'uv',att:'t'}
+						],
+						'i'//,true,null,'LINE_STRIP'
+					).flush();
+				};
+			loop();
+			document.body.appendChild(main.c);
+		})();
 		</script>
 	</body>
 </html>
