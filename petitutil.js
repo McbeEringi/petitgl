@@ -115,7 +115,7 @@ const cube=(x=1,c)=>{
 	];
 	return{
 		p:n.map(y=>y*x),n,
-		c:new Array(6).fill().map((_,i)=>new Array(4).fill(c||[...hsv(i/6),1])).flat(2),
+		c:new Array(6).fill().map((_,i)=>new Array(4).fill(c||[...hsv(i/6),1])).flat(),
 		t:new Array(6).fill([0,0,1,0,1,1,0,1]).flat(),
 		i:new Array(6).fill().map((_,i)=>{i*=4;return[0,1,2,0,2,3].map(y=>y+i);}).flat()
 	};
