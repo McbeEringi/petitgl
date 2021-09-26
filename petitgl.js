@@ -2,9 +2,8 @@
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
-		gl.clearColor(...col);
-		gl.enable(gl.CULL_FACE);gl.frontFace(gl.CCW);
-		gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.clearDepth(1);
+		gl.enable(gl.CULL_FACE);
+		gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
 		gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE);
 		console.log(gl);
 		this.gl=gl;this.c=c;this.log='';this.col=col;
@@ -124,14 +123,15 @@ class PetitGL{
 	uni(pn,unis){
 		const gl=this.gl,
 			fim={
-				0:{},
-				i:[0,'uniform1iv','uniform2iv','uniform3iv','uniform4iv'],
-				f:[0,'uniform1fv','uniform2fv','uniform3fv','uniform4fv'],
+				i:[,'uniform1iv','uniform2iv','uniform3iv','uniform4iv'],
+				f:[,'uniform1fv','uniform2fv','uniform3fv','uniform4fv'],
 				m:{4:'uniformMatrix2fv',9:'uniformMatrix3fv',16:'uniformMatrix4fv'}
 			};
 		let texi=0;
+		gl.useProgram(this.prg_[pn].dat);
 		for(const x of unis){
-			if(fim[x.type||0][x.data.length])gl[fim[x.type][x.data.length]](this.uloc_[pn][x.loc],...(x.type=='m'?[false,x.data]:[x.data]));
+			if(!this.uloc_[pn][x.loc])continue;
+			if((fim[x.type]||{})[x.data.length])gl[fim[x.type][x.data.length]](this.uloc_[pn][x.loc],...(x.type=='m'?[false,x.data]:[x.data]));
 			else if(typeof x.data=='string'){
 				const tex=this.tex_[x.data];if(!tex)continue;
 				gl.activeTexture(gl['TEXTURE'+texi]);
@@ -145,7 +145,7 @@ class PetitGL{
 				gl.uniform1i(this.uloc_[pn][x.loc],texi);
 				if(x.rname)gl.uniform2fv(this.uloc_[pn][x.rname],tex.size);
 				texi++;
-			}else throw x;
+			}else throw`unknown type ${JSON.stringify(x)}`;
 		}
 		return this;
 	}
@@ -156,9 +156,10 @@ class PetitGL{
 		if(cl)gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.clearColor(...this.col);gl.clearDepth(1);
 		this.gl.viewport(0,0,buf?this.buf_[buf].w:this.c.width,buf?this.buf_[buf].h:this.c.height);
 		for(const x of atts){
+			const loc=this.aloc_[pn][x.loc];if(!~loc)continue;
 			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.att].dat);
-			gl.enableVertexAttribArray(this.aloc_[pn][x.loc]);
-			gl.vertexAttribPointer(this.aloc_[pn][x.loc],this.att_[x.att].slice,gl.FLOAT,false,0,0);
+			gl.enableVertexAttribArray(loc);
+			gl.vertexAttribPointer(loc,this.att_[x.att].slice,gl.FLOAT,false,0,0);
 			gl.bindBuffer(gl.ARRAY_BUFFER,null);
 		}
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[ibo].dat);

@@ -5,18 +5,19 @@ class PetitM4{
 	get(){return this.main;}
 	_norm(x){const l=Math.sqrt([...x].reduce((a,y)=>a+y*y,0));return l?x.map(y=>y/l):x;}
 	mul(x){
-		const a=this.main,b=(x||this).main||x;
-		this.main.set(new Array(16).fill().map((_,i)=>
-			new Array(4).fill().reduce((ac,x,j)=>ac+a[i%4+j*4]*b[Math.floor(i/4)+j])
+		const b=this.main,a=(x||this).main||x;//console.log(x,a,b)
+		this.main.set([0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3].map((m,i)=>
+			new Array(4).fill().reduce((p,_,j)=>p+a[m+j*4]*b[i-m+j],0)
 		));
 		return this;
 	}
 	transpose(){
-		this.main.set(new Array(16).fill().map((_,i)=>this.main[[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15][i]]));
+		this.main.set(this.main.map((_,i)=>this.main[[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15][i]]));
 		return this;
 	}
-	inv(x){
-		const a=x[0]*x[5]-x[1]*x[4],b=x[0]*x[6]-x[2]*x[4],c=x[0]*x[7]-x[3]*x[4],d=x[1]*x[6]-x[2]*x[5],
+	inv(){
+		const x=this.main,
+			a=x[0]*x[5]-x[1]*x[4],b=x[0]*x[6]-x[2]*x[4],c=x[0]*x[7]-x[3]*x[4],d=x[1]*x[6]-x[2]*x[5],
 			e=x[1]*x[7]-x[3]*x[5],f=x[2]*x[7]-x[3]*x[6],g=x[8]*x[13]-x[9]*x[12],h=x[8]*x[14]-x[10]*x[12],
 			i=x[8]*x[15]-x[11]*x[12],j=x[9]*x[14]-x[10]*x[13],k=x[9]*x[15]-x[11]*x[13],l=x[10]*x[15]-x[11]*x[14],
 			idet=1/(a*l-b*k+c*j+d*i-e*h+f*g);
@@ -47,11 +48,9 @@ class PetitM4{
 			.mul([1,0,0,0, 0,t[0][0],t[0][1],0, 0,-t[0][1],t[0][0],0, 0,0,0,1]);
 	}
 	lookat(c=[0,0,1],o=[0,0,0],u=[0,1,0]){
-		this.translate(o.map((x,i)=>x-c[i]));
-		const z=this._norm(c.map((x,i)=>x-o[i])),
-			x=z.map((x,i)=>{const a=x*u[i];return a/Math.sqrt(a);}),
-			y=x.map((x,i)=>x*z[i]);
-		return this.mul([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,0,0,0,1]);
+		const cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],
+			z=this._norm(c.map((x,i)=>x-o[i])),x=this._norm(cr(u,z)),y=this._norm(cr(z,x));
+		return this.mul([x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0, ...o.map((x,i)=>x-c[i]),1]);
 	}
 	pers(v,r,n,f){
 		const t=n*Math.tan(v*Math.PI/360),d=1/(f-n);
