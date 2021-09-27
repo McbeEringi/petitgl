@@ -29,7 +29,7 @@ class PetitM4{
 		]);
 		return this;
 	}
-	scale(x=[]){return this.mul([x[0]??1,0,0,0 ,0,x[1]??1,0,0, 0,0,x[2]??1,0, 0,0,0,1]);}
+	scale(x=[]){if(typeof x=='number')x=[x,x,x];return this.mul([x[0]??1,0,0,0 ,0,x[1]??1,0,0, 0,0,x[2]??1,0, 0,0,0,1]);}
 	translate(x=[]){return this.mul([1,0,0,0, 0,1,0,0, 0,0,1,0, x[0]??1,x[1]??1,x[2]??1,1]);}
 	rot(a=[0,1,0],t=0){
 		const s=Math.sin(t),c=Math.cos(t),ic=1-c;a=this._norm(a);

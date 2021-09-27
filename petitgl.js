@@ -106,6 +106,7 @@ class PetitGL{
 	ibo(ibos){
 		const gl=this.gl;
 		for(const x of ibos){
+			if(x.data.length>0x10000){console.warn(`too long index "${x.name}". must be shorter than 65536. excess wont be rendered.`);x.data=x.data.slice(0,0x10000);}
 			if(!this.ibo_[x.name])this.ibo_[x.name]={dat:gl.createBuffer()};
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[x.name].dat);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Int16Array(x.data),gl.STATIC_DRAW);
