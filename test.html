@@ -17,7 +17,7 @@
 		<script src="petitutil.js"></script>
 		<script>
 		(async()=>{
-			const model=obj(await(await fetch('obj/test.obj')).text(),[.4,.2,.8,1]),//torus(2),
+			const model=obj(await(await fetch('obj/rabbit.obj')).text(),0),//torus(2),
 				main=new PetitGL(undefined,[0,0,0,1])
 					.resize(1024,1024)
 					.tex([
@@ -60,7 +60,7 @@
 				loop=()=>{
 					requestAnimationFrame(loop);
 					const t=(Date.now()*.001)%86400-43200,
-						m=new PetitM4().rot([0,1,1],t*.5),
+						m=new PetitM4().scale(50).rot([0,1,1],t*.5),
 						mvp=m.copy().mul(vp),
 						im=m.copy().inv();
 					main

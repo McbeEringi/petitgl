@@ -142,21 +142,32 @@ torus=(x=1,c,sx=16,sy=sx*2)=>{
 	return fmarr(x);
 },
 obj=(x,col=[1,1,1,1])=>{
-	const v=(x.match(/^v .+$/gm)||[]).map((y,i,a)=>{
+	const t0=Date.now(),
+		spl=(y,i)=>y.split(' ',i).filter(z=>z).slice(1),
+		v=(x.match(/^v .+$/gm)||[]).map((y,i,a)=>{
 			a=col?col:[...hsv(i/a.length),1];
-			y=y.split(' ').filter(z=>z).slice(1).map(Number);
+			y=spl(y).map(Number);
 			return({
 				3:()=>[y,a],
 				4:()=>{y[3]=1/x[3];return[y.slice(0,3).map(z=>z*y[3]),a];},
 				6:()=>[y.slice(0,3),[...y.slice(3,6),1]],
 			}[y.length])();
 		}),
-		vt=(x.match(/^vt .+$/gm)||[]).map(y=>y.split(' ',3).filter(z=>z).slice(1).map(Number)),
-		vn=(x.match(/^vn .+$/gm)||[]).map(y=>y.split(' ',4).filter(z=>z).slice(1).map(Number));
+		vt=(x.match(/^vt .+$/gm)||[]).map(y=>spl(y,3).map(Number)),
+		vn=(x.match(/^vn .+$/gm)||[]).map(y=>spl(y,4).map(Number));
 	x=(x.match(/^f .+$/gm)||[]).map(y=>{
-		y=y.split(' ').filter(z=>z).slice(1).map(z=>z.split('/'));
+		y=spl(y);
 		return new Array(y.length-2).fill().map((_,i)=>[y[0],y[1+i],y[2+i]]);
-	}).flat(2).map((y,i)=>[v[y[0]-1][0],y[2]?vn[y[2]-1]:[0,1,0],v[y[0]-1][1],y[1]?vt[y[1]-1]:[0,0],i]);
-	return fmarr(x);
+	}).flat(2);
+	const set=[...new Set(x)],
+		obj=new Map(set.map((y,i)=>[y,i])),
+		i=x.map(y=>obj.get(y));
+	x=set.map(y=>{
+		y=y.split('/');
+		return[v[y[0]-1][0],y[2]?vn[y[2]-1]:[0,1,0],v[y[0]-1][1],y[1]?vt[y[1]-1]:[0,0]];
+	});
+	x={...fmarr(x),i};
+	console.info('obj',`${Date.now()-t0}ms`);
+	return x;
 },
 hsv=(h=0,s=1,v=1)=>{h*=6;const f=h%1;return[[0,3,1],[2,0,1],[1,0,3],[1,2,0],[3,1,0],[0,1,2]][Math.floor(h)%6].map(x=>v*(1-s*[0,1,f,1-f][x]));};
