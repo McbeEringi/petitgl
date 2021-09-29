@@ -145,11 +145,11 @@ obj=(x,col=[1,1,1,1])=>{
 	const t0=Date.now(),
 		spl=(y,i)=>y.split(' ',i).filter(z=>z).slice(1),
 		v=(x.match(/^v .+$/gm)||[]).map((y,i,a)=>{
-			a=col?col:[...hsv(i/a.length),1];
+			a=col||[...hsv(i/a.length),1];
 			y=spl(y).map(Number);
 			return({
 				3:()=>[y,a],
-				4:()=>{y[3]=1/x[3];return[y.slice(0,3).map(z=>z*y[3]),a];},
+				4:()=>{y[3]=1/y[3];return[y.slice(0,3).map(z=>z*y[3]),a];},
 				6:()=>[y.slice(0,3),[...y.slice(3,6),1]],
 			}[y.length])();
 		}),
@@ -159,12 +159,11 @@ obj=(x,col=[1,1,1,1])=>{
 		y=spl(y);
 		return new Array(y.length-2).fill().map((_,i)=>[y[0],y[1+i],y[2+i]]);
 	}).flat(2);
-	const set=[...new Set(x)],
-		obj=new Map(set.map((y,i)=>[y,i])),
+	const set=[...new Set(x)],obj=new Map(set.map((y,i)=>[y,i])),
 		i=x.map(y=>obj.get(y));
 	x=set.map(y=>{
 		y=y.split('/');
-		return[v[y[0]-1][0],y[2]?vn[y[2]-1]:[0,1,0],v[y[0]-1][1],y[1]?vt[y[1]-1]:[0,0]];
+		return[v[y[0]-1][0],y[2]?vn[y[2]-1]:[0,0,0],v[y[0]-1][1],y[1]?vt[y[1]-1]:[0,0]];
 	});
 	x={...fmarr(x),i};
 	console.info('obj',`${Date.now()-t0}ms`);

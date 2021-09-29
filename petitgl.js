@@ -1,4 +1,3 @@
-//build: 2109210
 class PetitGL{
 	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
