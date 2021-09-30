@@ -17,6 +17,7 @@
 		<script src="petitutil.js"></script>
 		<script>
 		(async()=>{
+			let qt=new PetitQ();
 			const model=obj(await(await fetch('obj/bunny.obj')).text(),0),//torus(2),
 				main=new PetitGL(undefined,[0,0,0,1])
 					.resize(1024,1024)
@@ -56,11 +57,11 @@
 					)
 					.defAtt('test',['position','normal','color','uv'])
 					.defUni('test',['time','res','mvp','im','tex0','tex0res']),
-				vp=new PetitM4().lookat([0,0,20],[0,0,0],[0,1,0]).pers(45,main.c.width/main.c.height,.1,100),
+				vp=new PetitM4().lookat([0,2,20],[0,2,0],[0,1,0]).pers(45,main.c.width/main.c.height,.1,100),
 				loop=()=>{
 					requestAnimationFrame(loop);
 					const t=(Date.now()*.001)%86400-43200,
-						m=new PetitM4().scale(50).rot([0,1,1],t*.5),
+						m=new PetitM4().scale(50).mul(qt.PetitM4()).rot([0,1,0],t*.5),
 						mvp=m.copy().mul(vp),
 						im=m.copy().inv();
 					main
@@ -85,6 +86,16 @@
 						'i'//,true,null,'LINE_STRIP'
 					).flush();
 				};
+			main.c.addEventListener('pointermove',e=>{
+				if(!e.isPrimary)return;
+				let cw=main.c.width,ch=main.c.height,
+					x=e.clientX-main.c.offsetLeft-cw*.5,
+					y=e.clientY-main.c.offsetTop-ch*.5,
+					sq=Math.sqrt(x*x+y*y),
+					r=sq*2*Math.PI/Math.sqrt(cw*cw+ch*ch);
+				sq=1/sq;
+				qt=new PetitQ().rot([-y*sq, -x*sq, 0.0], r);
+			});
 			loop();console.log(model);
 			document.body.appendChild(main.c);
 		})();
