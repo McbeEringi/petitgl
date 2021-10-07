@@ -2,13 +2,15 @@
 ![icon](img/icon.svg)  
 A *petit* JS libraries to handle WebGL more easily  
 [GitHub repo](https://github.com/mcbeeringi/petitgl)  
-## files
+## References
+huge thanks to [wgld.org](https://wgld.org)
+## Files
 - [PetitGL](petitgl.js)  
 	library for handling WebGL.
 - [PetitUtil](petitutil.js)  
 	library for calc matrix and quaternion.
 
-## usage
+## Usage
 ### PetitGL
 #### canvas
 - **instance**
@@ -218,5 +220,5 @@ A *petit* JS libraries to handle WebGL more easily
 		default is `TRIANGLES`.
 
 
-## example
+## Example
 see index.html
