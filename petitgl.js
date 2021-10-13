@@ -94,11 +94,10 @@ class PetitGL{
 	att(atts){
 		const gl=this.gl;
 		for(const x of atts){
-			if(!this.att_[x.name])this.att_[x.name]={dat:gl.createBuffer()};
+			if(!this.att_[x.name])this.att_[x.name]={dat:gl.createBuffer(),slice:x.slice};
 			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.name].dat);
 			gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(x.data),gl.STATIC_DRAW);
 			gl.bindBuffer(gl.ARRAY_BUFFER,null);
-			this.att_[x.name].slice=x.slice;
 		}
 		return this;
 	}
