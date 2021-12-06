@@ -26,8 +26,8 @@
 
 //初期化fragmentコード (バッファの初期化
 precision mediump float;
-uniform vec2 res;
-uniform float time;
+uniform float time; //UTC秒(日)
+uniform vec2 res; //バッファ解像度
 vec2 hash22(vec2 p){ //https://www.shadertoy.com/view/4djSRW
 	vec3 p3=fract(vec3(p.xyx)*vec3(.1031,.1030,.0973));
 	p3+=dot(p3,p3.yzx+33.33);
@@ -41,9 +41,9 @@ void main(){
 
 //メインループfragmentコード (バッファの更新(60回/秒
 precision mediump float;
-uniform float time; //UTC秒(日)
-uniform vec2 res; //バッファ解像度
-uniform sampler2D buffer; //バッファ
+uniform float time;
+uniform vec2 res;
+uniform sampler2D buffer;
 void main(){
 	vec4 tex=texture2D(buffer,gl_FragCoord.xy/res);
 	float t=time*.1;
