@@ -109,7 +109,7 @@ document.body.appendChild(main.c);
 </script>
 		<script>
 		marked.setOptions({highlight:(c,l)=>hljs.highlightAuto(c,[l]).value});
-		fetch('README.md').then(x=>x.text()).then(x=>document.body.insertAdjacentHTML('afterbegin',marked(x)));
+		fetch('README.md').then(x=>x.text()).then(x=>document.body.insertAdjacentHTML('afterbegin',marked.parse(x)));
 		document.body.insertAdjacentHTML('beforeend',`<pre id="demosrc"><code>${hljs.highlight(src.textContent,{language:'js'}).value}</code></pre>`);
 		</script>
 	</body>
