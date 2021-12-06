@@ -42,7 +42,7 @@ class PetitGL{
 		else{
 			if(!vsh.sta)this.log+=`${pn}_vsh:\n${vsh.log}\n`;
 			if(!fsh.sta)this.log+=`${pn}_fsh:\n${fsh.log}\n`;
-			this.log+='\n';
+			this.log+='\n';console.warn(vsh.log,fsh.log);
 		};
 		return this;
 	}
