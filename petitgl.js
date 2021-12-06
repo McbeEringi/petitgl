@@ -74,7 +74,7 @@ class PetitGL{
 			gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,d);
 			gl.bindTexture(gl.TEXTURE_2D,t);
 			gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
-			this._mip(gl,w,h);
+			this._mip(gl,(x.mip?[w,h]:[0,0]));
 			gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);
 			gl.bindTexture(gl.TEXTURE_2D,null);
 			gl.bindRenderbuffer(gl.RENDERBUFFER,null);
