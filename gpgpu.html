@@ -40,9 +40,11 @@
 				uniform sampler2D buffer;
 				void main(){
 					vec4 tex=texture2D(buffer,gl_FragCoord.xy/res);
+					float t=time*.1;
+					vec2 pos=vec2(cos(t),sin(t))*.5;
 					tex.xy+=tex.zw;
-					tex.zw+=-normalize(tex.xy)/(length(tex.xy)*length(tex.xy))*.00001;
-					if(length(tex.xy)<.1)tex.zw=vec2(0);
+					tex.zw+=normalize(pos-tex.xy)/(distance(pos,tex.xy)*distance(pos,tex.xy))*.00001;
+					tex.zw=mix(tex.zw,vec2(0),step(distance(pos,tex.xy),.1));
 					gl_FragColor=tex;
 				}`
 			)
@@ -50,10 +52,10 @@
 				`attribute float IND;
 				uniform vec2 res;
 				uniform sampler2D buffer;
-				varying float i;
+				varying vec2 p;
 				void main(){
-					i=IND;
-					vec4 tex=texture2D(buffer,vec2(mod(IND,res.x),floor(IND/res.x))/res);
+					p=vec2(mod(IND,res.x),floor(IND/res.x))/res;
+					vec4 tex=texture2D(buffer,p);
 					gl_Position=vec4(tex.xy,0,1);
 					gl_PointSize=2.;
 				}`,
@@ -61,11 +63,14 @@
 				uniform float time;
 				uniform vec2 res;
 				uniform sampler2D buffer;
-				varying float i;
-				float hash11(float p){p=fract(p*.1031);p*=p+33.33;p*=p+p;return fract(p);}
+				varying vec2 p;
+				vec2 hash22(vec2 p){vec3 p3=fract(vec3(p.xyx)*vec3(.1031,.1030,.0973));p3+=dot(p3,p3.yzx+33.33);return fract((p3.xx+p3.yz)*p3.zy)*2.-1.;}
 				vec3 col(float t){t*=6.2832;return sin(vec3(t,t+2.1,t+4.2))*.5+.5;}
 				void main(){
-					gl_FragColor=vec4(col(hash11(i)),1);
+					vec4 tex=texture2D(buffer,p);
+					float t=time*.1;
+					vec2 pos=vec2(cos(t),sin(t))*.5;
+					gl_FragColor=mix(vec4(col(hash22(p*1000.).x),1),vec4(.2),smoothstep(.11,.09,distance(pos,tex.xy))*.9);
 				}`
 			)
 			.defAtt('init',['UV']).defUni('init',['time','res','buffer'])
