@@ -148,7 +148,7 @@ class PetitGL{
 		}
 		return this;
 	}
-	draw(pn,atts=[],ibo,cl=1,buf,mode='TRIANGLES'){
+	draw(pn,atts=[],ibo,cl=1,buf,mode='TRIANGLES',drawArr=0){
 		const gl=this.gl;
 		gl.useProgram(this.prg_[pn].dat);
 		if(buf)gl.bindFramebuffer(gl.FRAMEBUFFER,this.buf_[buf].f);
@@ -161,8 +161,12 @@ class PetitGL{
 			gl.vertexAttribPointer(loc,this.att_[x.att].slice,gl.FLOAT,false,0,0);
 			gl.bindBuffer(gl.ARRAY_BUFFER,null);
 		}
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[ibo].dat);
-		gl.drawElements(gl[mode],this.ibo_[ibo].l,gl.UNSIGNED_SHORT,0);
+		if(drawArr)
+			gl.drawArrays(gl[mode],0,this.ibo_[ibo].l);
+		else{
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[ibo].dat);
+			gl.drawElements(gl[mode],this.ibo_[ibo].l,gl.UNSIGNED_SHORT,0);	
+		}
 		if(buf)gl.bindFramebuffer(gl.FRAMEBUFFER,null);
 		return this;
 	}

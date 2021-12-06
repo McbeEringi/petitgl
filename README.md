@@ -195,7 +195,7 @@ huge thanks to [wgld.org](https://wgld.org)
 #### draw
 - **draw**
 	```js
-		this.draw(prgName, atts, ibo, clear, buf, mode);
+		this.draw(prgName, atts, ibo, clear, buf, mode, drawArr);
 	```
 	- `prgName` prgName:String  
 		specify program to get uniform location with prgName.
@@ -218,6 +218,11 @@ huge thanks to [wgld.org](https://wgld.org)
 	- `mode` *Optional* glDrawMode  
 		defines drawmode with String.  
 		default is `TRIANGLES`.
+	- `drawArr` *Optional* Boolean  
+		defines drawmode with Boolean.  
+		set `true` to use `drawArrays`  
+		otherwise it will execute `drawElements`  
+		default is `false`.
 
 
 ## Example
