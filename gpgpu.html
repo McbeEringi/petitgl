@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>GPGPU</title>
+	<meta name="theme-color" content="#63c"/>
+</head>
+<body>
+	<style>
+		:root{background:#000;color:#fff;font-family:monospace;}
+		a:link,a:visited{color:#aef;}a:hover{color:#8af;}a:active{color:#48f;}
+		html,body{height:100%;margin:0;}
+		canvas{display:block;width:100%;height:100%;object-fit:contain;}
+	</style>
+	<script src="petitgl.js"></script>
+	<script>
+		let btex=false;
+		const res=[512,512],
+			main=new PetitGL(undefined,undefined,0)
+			.resize(...[1024,1024])
+			.buffer([
+				{name:'buff0',tex:'btex0',w:res[0],h:res[1]},
+				{name:'buff1',tex:'btex1',w:res[0],h:res[1]}
+			])
+			.att([{name:'_uv',data:[-1,-1, 1,-1, -1,1, 1,1],slice:2},{name:'_ind',data:[...new Array(res[0]*res[1]).keys()],slice:1}])
+			.ibo([{name:'ibo',data:[0,1,2, 3,2,1]}])
+			.compile('init',
+				`attribute vec2 UV;void main(){gl_Position=vec4(UV,0,.1);}`,
+				`precision mediump float;
+				uniform vec2 res;
+				vec2 hash22(vec2 p){vec3 p3=fract(vec3(p.xyx)*vec3(.1031,.1030,.0973));p3+=dot(p3,p3.yzx+33.33);return fract((p3.xx+p3.yz)*p3.zy)*2.-1.;}
+				void main(){gl_FragColor=vec4(gl_FragCoord.xy/res*2.-1.,hash22(gl_FragCoord.xy)*.001);}`
+			)
+			.compile('main',
+				`attribute vec2 UV;void main(){gl_Position=vec4(UV,0,1);}`,
+				`precision mediump float;
+				uniform float time;
+				uniform vec2 res;
+				uniform sampler2D buffer;
+				void main(){
+					vec4 tex=texture2D(buffer,gl_FragCoord.xy/res);
+					tex.xy+=tex.zw;
+					tex.zw+=-normalize(tex.xy)/(length(tex.xy)*length(tex.xy))*.00001;
+					if(length(tex.xy)<.1)tex.zw=vec2(0);
+					gl_FragColor=tex;
+				}`
+			)
+			.compile('disp',
+				`attribute float IND;
+				uniform vec2 res;
+				uniform sampler2D buffer;
+				varying float i;
+				void main(){
+					i=IND;
+					vec4 tex=texture2D(buffer,vec2(mod(IND,res.x),floor(IND/res.x))/res);
+					gl_Position=vec4(tex.xy,0,1);
+					gl_PointSize=2.;
+				}`,
+				`precision highp float;
+				uniform float time;
+				uniform vec2 res;
+				uniform sampler2D buffer;
+				varying float i;
+				float hash11(float p){p=fract(p*.1031);p*=p+33.33;p*=p+p;return fract(p);}
+				vec3 col(float t){t*=6.2832;return sin(vec3(t,t+2.1,t+4.2))*.5+.5;}
+				void main(){
+					gl_FragColor=vec4(col(hash11(i)),1);
+				}`
+			)
+			.defAtt('init',['UV']).defUni('init',['time','res','buffer'])
+			.defAtt('main',['UV']).defUni('main',['time','res','buffer'])
+			.defAtt('disp',['IND']).defUni('disp',['time','res','buffer'])
+			.uni('init',[{loc:'res',data:res,type:'f'}])
+			.draw('init',[{loc:'UV',att:'_uv'}],'ibo',true,'buff'+(+btex)),
+			loop=()=>{
+				const t=[(Date.now()*.001)%86400];
+				main
+				.uni('main',[{loc:'time',data:t,type:'f'},{loc:'res',data:res,type:'f'},{loc:'buffer',data:'btex'+(+btex)}])
+				.draw('main',[{loc:'UV',att:'_uv'}],'ibo',true,'buff'+(+!btex))
+				.uni('disp',[{loc:'time',data:t,type:'f'},{loc:'res',data:res,type:'f'},{loc:'buffer',data:'btex'+(!btex)}])
+				.draw('disp',[{loc:'IND',att:'_ind'}],'',true,false,'POINTS',1).flush();
+				btex=!btex;
+				requestAnimationFrame(loop);
+			};
+		document.body.appendChild(main.c);
+		loop();
+	</script>
+</body>
+</html>

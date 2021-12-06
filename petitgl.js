@@ -1,14 +1,16 @@
 class PetitGL{
-	constructor(c=document.createElement('canvas'),col=[0,0,0,0]){
+	constructor(c=document.createElement('canvas'),col=[0,0,0,0],blend=1){
 		const gl=c.getContext('webgl',{preserveDrawingBuffer:true})||c.getContext('experimental-webgl',{preserveDrawingBuffer:true});
 		gl.enable(gl.CULL_FACE);
 		gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
-		gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE);
+		if(blend){gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE);}
 		console.log(gl);
-		this.gl=gl;this.c=c;this.log='';this.col=col;
+		this.gl=gl;this.c=c;this.log='';this.col=col;this._ubf=gl.UNSIGNED_BYTE;
 		this.prg_={};this.buf_={};this.uloc_={};this.tex_={};
 		this.ibo_={};this.aloc_={};this.att_={};
 		if(this.gl.getExtension('OES_standard_derivatives'))console.log('OES_standard_derivatives');
+		if(this.gl.getExtension('OES_texture_float_linear')&&this.gl.getExtension('OES_texture_float'))
+			this._ubf=gl.FLOAT;
 		return this;
 	}
 	resize(w,h){this.c.width=w;this.c.height=h;return this;}
@@ -73,7 +75,7 @@ class PetitGL{
 			gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,w,h);
 			gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,d);
 			gl.bindTexture(gl.TEXTURE_2D,t);
-			gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+			gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,this._ubf,null);
 			this._mip(gl,(x.mip?[w,h]:[0,0]));
 			gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);
 			gl.bindTexture(gl.TEXTURE_2D,null);
@@ -139,7 +141,7 @@ class PetitGL{
 				if(tex.animate||tex.flush){
 					tex.flush=false;
 					gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
-					gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,tex.data);
+					gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,this._ubf,tex.data);
 					this._mip(gl,...tex.size);
 				}
 				gl.uniform1i(this.uloc_[pn][x.loc],texi);

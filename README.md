@@ -15,7 +15,7 @@ huge thanks to [wgld.org](https://wgld.org)
 #### canvas
 - **instance**
 	```js
-	new PetitGL(canvas, color);
+	new PetitGL(canvas, color, blend);
 	```
 	- `canvas` *Optional* HTMLCanvasElement  
 		canvas to draw. if undefined creates new canvas.  
@@ -23,6 +23,9 @@ huge thanks to [wgld.org](https://wgld.org)
 	- `color` *Optional* Array(4)  
 		rgba normalized array to clear canvas.  
 		default is `[0,0,0,0]`
+	- `blend` *Optional* Boolean  
+		defines BLEND  
+		default is `true`
 
 - **resize**
 	```js
@@ -92,16 +95,19 @@ huge thanks to [wgld.org](https://wgld.org)
 	```
 	- `bufs` Array  
 		```js
-		[{name, tex, width, height}...]
+		[{name, tex, w, h, mip}...]
 		```
 		- `name` bufName:String  
 			defines buffer name with String.
 		- `tex` texName:String  
 			defines texture name to access from uniforms with String.
-		- `width` *Optional* Number  
+		- `w` *Optional* Number  
 			defines width of buffer with Number.
-		- `height` *Optional* Number  
+		- `h` *Optional* Number  
 			defines height of buffer with Number.
+		- `mip` *Optional* Boolean  
+			defines mipmap generation.  
+			default to `false`  
 
 #### attributes
 - **defAtt**
