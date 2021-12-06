@@ -98,6 +98,7 @@ class PetitGL{
 			gl.bindBuffer(gl.ARRAY_BUFFER,this.att_[x.name].dat);
 			gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(x.data),gl.STATIC_DRAW);
 			gl.bindBuffer(gl.ARRAY_BUFFER,null);
+			this.att_[x.name].l=x.data.length;
 		}
 		return this;
 	}
@@ -162,7 +163,7 @@ class PetitGL{
 			gl.bindBuffer(gl.ARRAY_BUFFER,null);
 		}
 		if(drawArr)
-			gl.drawArrays(gl[mode],0,this.ibo_[ibo].l);
+			gl.drawArrays(gl[mode],0,this.att_[atts[0].att].l);
 		else{
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ibo_[ibo].dat);
 			gl.drawElements(gl[mode],this.ibo_[ibo].l,gl.UNSIGNED_SHORT,0);	
