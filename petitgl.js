@@ -9,8 +9,8 @@ class PetitGL{
 		this.prg_={};this.buf_={};this.uloc_={};this.tex_={};
 		this.ibo_={};this.aloc_={};this.att_={};
 		if(this.gl.getExtension('OES_standard_derivatives'))console.log('OES_standard_derivatives');
-		if(this.gl.getExtension('OES_texture_float_linear')&&this.gl.getExtension('OES_texture_float'))
-			this._ubf=gl.FLOAT;
+		/*if(this.gl.getExtension('OES_texture_float_linear')&&this.gl.getExtension('OES_texture_float'))
+			this._ubf=gl.FLOAT;*/
 		return this;
 	}
 	resize(w,h){this.c.width=w;this.c.height=h;return this;}
