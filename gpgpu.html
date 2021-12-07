@@ -92,7 +92,7 @@ void main(){
 		const res=[512,512],
 			time=()=>(Date.now()*.001)%86400,
 			main=new PetitGL(c,undefined,0);
-		if(main.gl.getExtension('OES_texture_float_linear')main.gl.getExtension('OES_texture_float'))
+		if(main.gl.getExtension('OES_texture_float_linear')&&main.gl.getExtension('OES_texture_float'))
 			main._ubf=main.gl.FLOAT;
 		main.resize(...[1024,1024])
 			.buffer([
