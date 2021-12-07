@@ -91,15 +91,17 @@ void main(){
 		let btex=false;
 		const res=[512,512],
 			time=()=>(Date.now()*.001)%86400,
-			main=new PetitGL(c,undefined,0)
-				.resize(...[1024,1024])
-				.buffer([
-					{name:'buff0',tex:'btex0',w:res[0],h:res[1]},
-					{name:'buff1',tex:'btex1',w:res[0],h:res[1]}
-				])
-				.att([{name:'_uv',data:[-1,-1, 1,-1, -1,1, 1,1],slice:2},{name:'_ind',data:[...new Array(res[0]*res[1]).keys()],slice:1}])
-				.ibo([{name:'ibo',data:[0,1,2, 3,2,1]}]),
-			compile=()=>{
+			main=new PetitGL(c,undefined,0);
+		if(main.gl.getExtension('OES_texture_float_linear')main.gl.getExtension('OES_texture_float'))
+			main._ubf=main.gl.FLOAT;
+		main.resize(...[1024,1024])
+			.buffer([
+				{name:'buff0',tex:'btex0',w:res[0],h:res[1]},
+				{name:'buff1',tex:'btex1',w:res[0],h:res[1]}
+			])
+			.att([{name:'_uv',data:[-1,-1, 1,-1, -1,1, 1,1],slice:2},{name:'_ind',data:[...new Array(res[0]*res[1]).keys()],slice:1}])
+			.ibo([{name:'ibo',data:[0,1,2, 3,2,1]}]);
+		const compile=()=>{
 				const tmp=txta.value.split('\n//---//\n');
 				main
 					.compile('init',`attribute vec2 UV;void main(){gl_Position=vec4(UV,0,1);}`,tmp[0])
